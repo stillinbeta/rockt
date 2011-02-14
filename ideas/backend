@@ -1,0 +1,47 @@
+Retrieving Data
+	Locations of Cars
+		Update every 2 minutes
+			One request every 15 seconds
+		URL Fetch
+		Check if "predictable" (in service)
+Storage
+	Car Location Data
+		num, lat, long, route_id
+		NextGPS retrieval
+	Stop
+		num, Lat, Long, route_id
+		GTFS Import (Make reusable)
+	Routes
+		rate, 
+	Rides
+		rider, carnum,  onstop, offstop, revenue, car_owner, inprogress?
+	Cars_User
+		user, rider
+		This might be transparent?
+	User
+		username, password, real_name, password, email, prefs (?)
+
+Procedure
+	Recieve GPS Data for Station/ Station ID
+	Return cars near station
+
+	Recieve Car
+		-> Add rider, carnum, onstop, carowner, inprogress=true to Rides
+
+	Recieve GPS Data / Station ID for checkout
+		Check if data sane
+		calculate revenue
+
+	If own car: free ride
+		revenue = 0
+	If other's car: bill
+		revenue = ???
+		rider.money -= revenue
+		car_owner.money += revenue
+	If not owned
+		present user offer to buy
+		database???
+	
+	Send user result
+
+		

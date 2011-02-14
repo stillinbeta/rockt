@@ -1,0 +1,30 @@
+User starts with ??? Cash
+	Each user gets ??? streetcars
+
+User enters car
+	If own car: free ride
+	If other's car: bill
+	If not owned:
+		offer to sell car
+		must respond before next user to ride car
+		first user on car has priority
+	Report outcome after checkout
+		no checkout after 1.5 hours -> ride cancelled
+	
+If owner goes broke:
+	Sell cars randomly, one by one.
+	If completely broke, ???
+
+
+Achievements:
+	"Frequent Flier"
+		5 checkins in one day
+	"Repeat Customer" 
+		Ride the same streetcar twice in 24 hours
+	"Payroll"
+		Ride in your own streetcar while a paying customer does
+	"LOL 69"
+		Ride 4069
+		
+	
+		
