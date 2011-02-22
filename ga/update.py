@@ -4,7 +4,7 @@ from google.appengine.ext import db
 from xml.dom import minidom
 from models import StreetcarLocation
 routes = range(501,513)
-api_url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r={0}&t=0'
+api_url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%s&t=0'
 
 
 class LocationUpdater(webapp.RequestHandler):
@@ -12,7 +12,7 @@ class LocationUpdater(webapp.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         for route in routes:
             route = str(route)
-            response = fetch(api_url.format(route))
+            response = fetch(api_url % route)
             tree = minidom.parseString(response.content)
             for vehicle in tree.getElementsByTagName('vehicle'):
                 car_id = int(vehicle.getAttribute('id'))
@@ -27,5 +27,6 @@ class LocationUpdater(webapp.RequestHandler):
                 car.put()
         rpc = db.create_rpc(deadline=5, read_policy=db.EVENTUAL_CONSISTENCY) 
         for car in StreetcarLocation.all().filter("in_service =",True).run(rpc=rpc):
-            self.response.out.write("{0} at {1} on route {2} active: {3}\n".format(car.key().name(),car.location,car.route,car.in_service))
+            self.response.out.write("%s at %s on route %s active: %s \n" % 
+            (car.key().name(),car.location,car.route,car.in_service))
         

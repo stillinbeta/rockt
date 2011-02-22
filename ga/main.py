@@ -14,7 +14,7 @@ class MainPage(webapp.RequestHandler):
 
         for car in StreetcarLocation.all().filter("in_service = ",True).fetch(limit=75,rpc=rpc):
             map_str += '%7C'+str(car.location)
-        self.response.out.write("<body><img src='{0}' /></body></html>".format(map_str))
+        self.response.out.write("<body><img src='%s' /></body></html>" % map_str)
 
 application = webapp.WSGIApplication(
                                     [('/',MainPage),
