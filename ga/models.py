@@ -6,3 +6,9 @@ class StreetcarLocation(db.Model):
     route = db.StringProperty()
     in_service = db.BooleanProperty()
 
+class Stop(db.Model):
+    num = db.StringProperty() #"number" is apparently sometimes not a number.
+    desc = db.StringProperty()
+    location = db.GeoPtProperty()
+    route = db.IntegerProperty()
+ 
