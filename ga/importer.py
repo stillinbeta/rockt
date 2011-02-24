@@ -53,7 +53,7 @@ for stop in stop_set:
     new_stop.desc = stop[1].title() #Make the description easy to read
     new_stop.location = "%s,%s" % (stop[2],stop[3])
     new_stop.route = int(stop[4])
-#    new_stop.put()
+    new_stop.put()
     count += 1
     print new_stop.desc + " imported."
 
