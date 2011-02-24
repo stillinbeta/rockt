@@ -10,7 +10,7 @@ handlers:
 - url: /
   script: main.py
 - url: /update
-  script: main.py
+  script: update.py
   login: admin
 - url: /import
   script: importer.py

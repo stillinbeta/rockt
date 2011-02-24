@@ -1,7 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
-from update import LocationUpdater
+#from update import LocationUpdater
 from models import StreetcarLocation
 
 class MainPage(webapp.RequestHandler):
@@ -18,7 +18,8 @@ class MainPage(webapp.RequestHandler):
 
 application = webapp.WSGIApplication(
                                     [('/',MainPage),
-                                     ('/update',LocationUpdater)],
+   #                                  ('/update',LocationUpdater),
+                                     ],
 									debug=True)
 def main():
     run_wsgi_app(application)
