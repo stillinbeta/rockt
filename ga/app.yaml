@@ -8,11 +8,18 @@ builtins:
 
 handlers:
 - url: /
+  static_files: static/index.html
+  upload: static/index.html
+
+- url: /streetcars
   script: main.py
+
 - url: /update
   script: update.py
   login: admin
+
 - url: /import
   script: importer.py
 
-
+- url: /assets
+  static_dir: assets

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Streetcars</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="initial-scale=1.0;  maximum-scale=1.0;" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<style type="text/css">
+		html, body, #map{
+			width:100%;
+			height:100%;
+			padding:0;
+			margin:0;
+		}
+	</style>
+	<script type="text/javascript">
+		var map;
+		var markers;
+		
+		function initialize() {
+			var latlng = new google.maps.LatLng(43.67457221164316,-79.3884249267578);
+			var myOptions = {
+			  zoom: 11,
+			  center: latlng,
+			  mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			map = new google.maps.Map(document.getElementById("map"), myOptions);
+			$.getJSON("/streetcars", {}, function(data) {
+				markers = new Array(data.length);
+				for (var i = 0; i < data.length; i++) {
+					markers[i] = new google.maps.Marker({
+						position: new google.maps.LatLng(data[i][0], data[i][1]), 
+						map: map
+					});
+				}
+				fitMarkers(map, markers);
+			});
+		}
+		
+		function fitMarkers(map, markers) {
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < markers.length; i++) {
+				bounds.extend(markers[i].getPosition());
+			}
+			map.fitBounds(bounds);
+		}
+	</script>
+</head>
+<body onload="initialize()">
+	<div id="map"></div>
+</body>
+</html>
