@@ -3,7 +3,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 #from update import LocationUpdater
 from models import StreetcarLocation
-import json
+import simplejson as json
 
 class MainPage(webapp.RequestHandler):
     def get(self):
