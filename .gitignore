@@ -1,2 +1,9 @@
 .DS_Store
 *.pyc
+*.swp
+data/
+gae
+stops.db
+update.sh
+index.yaml
+
