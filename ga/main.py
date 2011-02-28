@@ -11,9 +11,9 @@ class MainPage(webapp.RequestHandler):
 
         rpc = db.create_rpc(deadline=5, read_policy=db.EVENTUAL_CONSISTENCY)
 
-        locations = []
+        locations = {}
         for car in StreetcarLocation.all().filter("in_service = ",True).run(rpc=rpc):
-            locations.append([car.location.lat, car.location.lon])
+            locations[car.key().name()]= (car.location.lat, car.location.lon)
         
         self.response.out.write(json.dumps(locations))
 

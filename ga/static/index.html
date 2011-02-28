@@ -27,13 +27,22 @@
 			};
 			map = new google.maps.Map(document.getElementById("map"), myOptions);
 			$.getJSON("/streetcars", {}, function(data) {
+                markers = []
+                for (var car in data) {
+                    markers.push( new google.maps.Marker( {
+                        position: new google.maps.LatLng(data[car][0], data[car][1]),
+                        map: map,
+                        title: car
+                    }));
+                }
+                /*
 				markers = new Array(data.length);
 				for (var i = 0; i < data.length; i++) {
 					markers[i] = new google.maps.Marker({
 						position: new google.maps.LatLng(data[i][0], data[i][1]), 
 						map: map
 					});
-				}
+				} */
 				fitMarkers(map, markers);
 			});
 		}
