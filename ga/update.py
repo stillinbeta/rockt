@@ -29,18 +29,19 @@ def create_callback(rpc,route):
 
 def remove_out_of_service():
     rpc = db.create_rpc(deadline=10, read_policy=db.EVENTUAL_CONSISTENCY)
-    query = StreetcarLocation.all()
+    query = StreetcarLocation.all(keys_only=True)
     all_streetcars = query.filter("in_service = ",True).run(rpc=rpc)
 
-    changed = []
+    to_remove = []
     for streetcar in all_streetcars:
-        key = streetcar.key().name()
+        key = streetcar.name()
         if key not in cars_updated:
+            to_remove.append(streetcar)
+    if to_remove:
+        streetcars = db.get(to_remove)
+        for streetcar in streetcars:
             streetcar.in_service = False
-            changed.append(streetcar)
-    if changed:
-        rpc = db.create_rpc(deadline=10, read_policy=db.EVENTUAL_CONSISTENCY)
-        db.put(changed)
+        db.put(streetcars)
 
 rpcs = []
 for route in routes:
