@@ -13,17 +13,15 @@ def process_response(rpc,route):
     response = rpc.get_result()
     tree = minidom.parseString(response.content)
     for vehicle in tree.getElementsByTagName('vehicle'):
-        car_id = vehicle.getAttribute('id')
-        car = StreetcarLocation.get_or_insert(key_name=car_id)
         if vehicle.getAttribute('predictable') == u'true':
+            car_id = vehicle.getAttribute('id')
+            car = StreetcarLocation.get_or_insert(key_name=car_id)
             car.location = (vehicle.getAttribute('lat')+","
                             +vehicle.getAttribute('lon'))
             car.route = route
             cars_updated.append(car_id)
             car.in_service = True
-        else:
-            car.in_service = False
-        car.put()
+            car.put()
     print "Route %s processed" % route
   
 def create_callback(rpc,route):
