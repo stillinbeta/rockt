@@ -44,7 +44,9 @@
 						map: map
 					});
 				} */
-				fitMarkers(map, markers);
+                if ( markers.length ) {
+				    fitMarkers(map, markers);
+                }
 			});
 		}
 		
