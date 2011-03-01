@@ -13,7 +13,7 @@ class MainPage(webapp.RequestHandler):
 
         locations = {}
         for car in StreetcarLocation.all().filter("in_service = ",True).run(rpc=rpc):
-            locations[car.key().name()]= (car.location.lat, car.location.lon)
+            locations[car.key().name()]= {'lat':car.location.lat, 'lon':car.location.lon}
         
         self.response.out.write(json.dumps(locations))
 

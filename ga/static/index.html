@@ -30,7 +30,8 @@
                 markers = []
                 for (var car in data) {
                     markers.push( new google.maps.Marker( {
-                        position: new google.maps.LatLng(data[car][0], data[car][1]),
+                        position: new google.maps.LatLng(data[car]['lat'],
+                             data[car]['lon']),
                         map: map,
                         title: car
                     }));
