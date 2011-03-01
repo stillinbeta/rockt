@@ -4,56 +4,27 @@ from google.appengine.ext import db
 from xml.dom import minidom
 from models import StreetcarLocation
 routes = range(501,513)
-api_url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%s&t=0'
+api_url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 
-
-cars_updated = []
-
-def process_response(rpc,route):
-    response = rpc.get_result()
-    tree = minidom.parseString(response.content)
-    for vehicle in tree.getElementsByTagName('vehicle'):
-        if vehicle.getAttribute('predictable') == u'true':
-            car_id = vehicle.getAttribute('id')
-            car = StreetcarLocation.get_or_insert(key_name=car_id)
-            car.location = (vehicle.getAttribute('lat')+","
-                            +vehicle.getAttribute('lon'))
-            car.route = route
-            cars_updated.append(car_id)
-            car.in_service = True
-            car.put()
-    print "Route %s processed" % route
-  
-def create_callback(rpc,route):
-    return lambda: process_response(rpc,route)
-
-def remove_out_of_service():
-    rpc = db.create_rpc(deadline=10, read_policy=db.EVENTUAL_CONSISTENCY)
-    query = StreetcarLocation.all(keys_only=True)
-    all_streetcars = query.filter("in_service = ",True).run(rpc=rpc)
-
-    to_remove = []
-    for streetcar in all_streetcars:
-        key = streetcar.name()
-        if key not in cars_updated:
-            to_remove.append(streetcar)
-    if to_remove:
-        streetcars = db.get(to_remove)
-        for streetcar in streetcars:
-            streetcar.in_service = False
-        db.put(streetcars)
-
-rpcs = []
+route_list = []
 for route in routes:
-    route = str(route)
-    rpc = urlfetch.create_rpc()
-    rpc.callback = create_callback(rpc,route)
-    urlfetch.make_fetch_call(rpc,api_url % route)
-    rpcs.append(rpc)
+    route_list.append(str(route)) 
 
 print "Content-Type: text/plain"
-apiproxy_stub_map.UserRPC.wait_all(rpcs)
-print "All Routes Updated"
-remove_out_of_service()
-print "Updated is complete"
+
+response = urlfetch.fetch(api_url)
+tree = minidom.parseString(response.content)
+for vehicle in tree.getElementsByTagName('vehicle'):
+    if (vehicle.getAttribute('predictable') == u'true' and
+        vehicle.getAttribute('routeTag') in route_list):
+        car_id = vehicle.getAttribute('id')
+        car = StreetcarLocation.get_or_insert(key_name=car_id)
+        car.location = (vehicle.getAttribute('lat')+","
+                        +vehicle.getAttribute('lon'))
+        car.route = vehicle.getAttribute('routeTag')
+        car.in_service = True
+        car.put()
+        print "Car %s processed" % car_id
+
+print "Update is Complete"
 
