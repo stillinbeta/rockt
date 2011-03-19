@@ -35,11 +35,13 @@ def update_streetcars():
         if (vehicle.getAttribute('routeTag') in route_list and
             vehicle.getAttribute('predictable') == u'true'):
             car_id = vehicle.getAttribute('id')
-            car = StreetcarLocation.get_or_insert(key_name=car_id)
-            car.location = (vehicle.getAttribute('lat')+","
-                            +vehicle.getAttribute('lon'))
+            car = StreetcarLocation.get_or_insert(key_name=car_id,
+                location=db.GeoPt('0,0'))
+            car.location = db.GeoPt(vehicle.getAttribute('lat'),
+                            vehicle.getAttribute('lon'))
             car.route = vehicle.getAttribute('routeTag')
             car.in_service = True
+            car.update_location()
             cars_updated.append(car.key())
             print "Car %s in service" % car_id
             car.put()

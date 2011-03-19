@@ -1,15 +1,14 @@
 from google.appengine.ext import db
+from geo.geomodel import GeoModel
 
-class StreetcarLocation(db.Model):
+class StreetcarLocation(GeoModel):
 #    num = db.IntegerProperty() #we're using key_name as car number
-    location = db.GeoPtProperty()
     route = db.StringProperty()
     in_service = db.BooleanProperty()
     
 
-class Stop(db.Model):
+class Stop(GeoModel):
     num = db.StringProperty() #"number" is apparently sometimes not a number.
     desc = db.StringProperty()
-    location = db.GeoPtProperty()
     route = db.IntegerProperty()
  
