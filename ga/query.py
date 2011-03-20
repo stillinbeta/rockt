@@ -16,7 +16,8 @@ class QueryPage(webapp.RequestHandler):
             stop = Stop.get(db.Key.from_path('Stop','stop-%s' % arg))
             nearby_cars = StreetcarLocation.proximity_fetch(
                                     StreetcarLocation.all().filter(
-                                        'route =',str(stop.route)),
+                                        'route =',str(stop.route)).filter(
+                                        'in_service =',True),
                                     stop.location,
                                     max_results=10,
                                     max_distance=500)

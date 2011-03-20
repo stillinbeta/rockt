@@ -19,7 +19,7 @@ class MainPage(webapp.RequestHandler):
         self.response.out.write(json.dumps(locations))
 
 application = webapp.WSGIApplication([('/streetcars',MainPage),
-                                      ('/query',QueryPage),
+                                      ('/query[/]?',QueryPage),
                                       ('/query/find',StationFinderPage),], debug=True)
 
 def main():
