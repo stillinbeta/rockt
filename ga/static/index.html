@@ -26,6 +26,11 @@
 			  mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
 			map = new google.maps.Map(document.getElementById("map"), myOptions);
+            var navControlDiv = document.createElement('div');
+            var navControl = new NavControl(navControlDiv,map);
+            navControlDiv.index=1;
+              map.controls[google.maps.ControlPosition.TOP_RIGHT].push(navControlDiv);
+
 			$.getJSON("/streetcars", {}, function(data) {
                 markers = []
                 for (var car in data) {
@@ -57,6 +62,15 @@
 			}
 			map.fitBounds(bounds);
 		}
+
+        function NavControl(controlDiv,map) {
+            controlDiv.style.padding='5px';
+            controlDiv.style.moz
+            controlDiv.style.backgroundColor='white';
+            controlDiv.style.border = '1px solid black';
+            controlDiv.style.borderTop = 'none';
+            controlDiv.innerHTML = '<a href="/query/">Station List</a> <a href="/query/find">Station Finder</a>';
+        }
 	</script>
 </head>
 <body onload="initialize()">
