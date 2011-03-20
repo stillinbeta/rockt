@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" >
+		<title>Select a Station</title>
+	</head>
+    <body>
+        <img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
+            &maptype=roadmap
+            &size=512x512
+            &markers=color:blue%7Clabel:U%7C{{ lat }},{{ lon }}
+            {% for stop in stops %}
+            &markers=color:red%7C{{ stop.location }}
+            {% endfor %}
+            &sensor=false" />
+        <ul>
+            {% for stop in stops %}
+                <li><a href="query?stop={{ stop.num }}">
+                    {{ stop.desc }}</a></li>
+            {% endfor %}
+        </ul>
+	</body>
+</html>

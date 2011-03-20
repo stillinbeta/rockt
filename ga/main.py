@@ -3,7 +3,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 #from update import LocationUpdater
 from models import StreetcarLocation
-from query import QueryPage
+from query import QueryPage,StationFinderPage
 import simplejson as json
 
 class MainPage(webapp.RequestHandler):
@@ -19,7 +19,8 @@ class MainPage(webapp.RequestHandler):
         self.response.out.write(json.dumps(locations))
 
 application = webapp.WSGIApplication([('/streetcars',MainPage),
-                                      ('/query',QueryPage)], debug=True)
+                                      ('/query',QueryPage),
+                                      ('/query/find',StationFinderPage),], debug=True)
 
 def main():
     run_wsgi_app(application)

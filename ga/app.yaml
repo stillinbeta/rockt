@@ -19,7 +19,7 @@ handlers:
   script: update.py
   login: admin
 
-- url: /query
+- url: /query/.*
   script: main.py
 
 - url: /import
