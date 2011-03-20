@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" >
+		<title>Stop {{ stop.num }}</title>
+	</head>
+    <body>
+        <h1>Cars near {{ stop.desc }} (on {{ stop.route }}) </h1>
+        <img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
+            &maptype=roadmap
+            &size=512x512
+            &markers=color:blue%7Clabel:S%7C{{ stop.location }}
+            {% for car in cars %}
+            &markers=color:red%7Clabel:C%7C{{ car.location }}
+            {% endfor %}
+            &sensor=false" />
+        <ul>
+            {% for car in cars %}
+                <li>{{ car.key.name }}</a></li>
+            {% endfor %}
+        </ul>
+	</body>
+</html>

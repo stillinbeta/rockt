@@ -2,10 +2,8 @@
 # due to lack of stop data by route. The entire process is very
 # inefficient, but it's destined to run once every few months. 
 from models import Stop
+from google.appengine.ext import db 
 import itertools
-
-
-#Start out with the route numbers. In Toronto, this is 501 to 512
 
 path_to_gtfs = 'data/' #this must be absolute 
 
@@ -48,11 +46,12 @@ print 'Content-Type: text/plain'
 
 count = 0
 for stop in stop_set:
-    new_stop = Stop.get_or_insert(key_name='stop-'+stop[0])
+    new_stop = Stop.get_or_insert(key_name='stop-'+stop[0],location=db.GeoPt('0,0'))
     new_stop.num = stop[0]
     new_stop.desc = stop[1].title() #Make the description easy to read
-    new_stop.location = "%s,%s" % (stop[2],stop[3])
+    new_stop.location = db.GeoPt(stop[2],stop[3])
     new_stop.route = int(stop[4])
+    new_stop.update_location()
     new_stop.put()
     count += 1
     print new_stop.desc + " imported."

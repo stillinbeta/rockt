@@ -19,6 +19,9 @@ handlers:
   script: update.py
   login: admin
 
+- url: /query
+  script: main.py
+
 - url: /import
   script: importer.py
 
