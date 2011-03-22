@@ -6,6 +6,7 @@ api_version: 1
 builtins: 
 - remote_api: on
 - datastore_admin: on
+- appstats: on 
 
 handlers:
 - url: /
