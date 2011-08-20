@@ -15,7 +15,7 @@
             &sensor=false" />
         <ul>
             {% for stop in stops %}
-                <li><a href="query?stop={{ stop.num }}">
+                <li><a href="/query?stop={{ stop.num }}">
                     {{ stop.desc }}</a></li>
             {% endfor %}
         </ul>

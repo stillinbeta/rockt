@@ -28,3 +28,6 @@ handlers:
 
 - url: /assets
   static_dir: assets
+
+- url: /car
+  script: main.py

@@ -16,7 +16,7 @@
             &sensor=false" />
         <ul>
             {% for car in cars %}
-                <li>{{ car.key.name }}</a></li>
+                <li><a href="/car?car={{ car.key.name }}">{{ car.key.name }}</a></li>
             {% endfor %}
         </ul>
 	</body>
