@@ -1,19 +1,20 @@
-<!DOCTYPE HTML>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" >
-		<title>Car {{ num }}</title>
-	</head>
-    <body>
+{% extends "base.html" %}
+{% block title %}Car {{ num }}{% endblock %}
+{% block content %}
         <h1>Car {{ num }}</h1>
-        <!--<img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
+        <img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
             &maptype=roadmap
             &size=512x512
-            &markers=color:blue%7Clabel:S%7C{{ stop.location }}
-            {% for car in cars %}
             &markers=color:red%7Clabel:C%7C{{ car.location }}
-            {% endfor %}
-            &sensor=false" /> -->
+            &sensor=false" />
+        {% ifequal status "available" %}
+            <p><a href="car?car={{ num }}&buy">Own this Car!</a></p>
+        {% else %}
+            {% ifequal status "mine" %}
+                <p>This is yours!</p>
+            {% endifequal %}
+        {% endifequal %}
+
 		<p> {{ car.location }} </p>
-	</body>
-</html>
+        <p> {{ username }} </p>
+{% endblock %}

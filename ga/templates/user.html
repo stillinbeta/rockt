@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ user.nickname }}{% endblock %}
+{% block content %}
+<h1>{{ user.nickname }}</h1>
+<h2>Balance: {{ user.balance }}</h2>
+<h2>Streetcars owned:</h2>
+<ul>
+    {% for streetcar in user.streectars %}
+    <li>
+        <a href="car?car={{ streetcar.Key.name }}">
+            {{ streetcar.Key.Name }}
+       </a>
+   </li>
+   {% endfor %}
+</ul>
+{% endblock %}

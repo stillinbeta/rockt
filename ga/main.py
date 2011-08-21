@@ -5,6 +5,7 @@ from google.appengine.ext import db
 from models import StreetcarLocation
 from query import QueryPage,StationFinderPage
 from car import CarPage
+from user import UserPage
 import simplejson as json
 
 class MainPage(webapp.RequestHandler):
@@ -22,6 +23,7 @@ class MainPage(webapp.RequestHandler):
 application = webapp.WSGIApplication([('/streetcars',MainPage),
                                       ('/query[/]?',QueryPage),
 									  ('/car',CarPage),
+									  ('/user',UserPage),
                                       ('/query/find',StationFinderPage),], debug=True)
 
 def main():

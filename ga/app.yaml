@@ -31,3 +31,10 @@ handlers:
 
 - url: /car
   script: main.py
+
+- url: /user
+  script: main.py
+
+- url: /remote_api
+  script: /home/sib/Devel/ga/google/appengine/ext/remote_api/handler.py
+  login: admin

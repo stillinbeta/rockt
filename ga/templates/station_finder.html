@@ -1,10 +1,6 @@
-<!DOCTYPE HTML>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" >
-		<title>Select a Station</title>
-	</head>
-    <body>
+{% extends "base.html" %}
+{% block title %} Select a Station {% endblock %}
+{% block content %}
         <img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
             &maptype=roadmap
             &size=512x512
@@ -19,5 +15,4 @@
                     {{ stop.desc }}</a></li>
             {% endfor %}
         </ul>
-	</body>
-</html>
+{% endblock %}

@@ -1,15 +1,10 @@
-<!DOCTYPE HTML>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" >
-		<title>Select a Station</title>
-	</head>
-    <body>
-        <ul>
-            {% for stop in stops %}
-                <li><a href="/query?stop={{ stop.num }}">
-                    {{ stop.desc }}</a></li>
-            {% endfor %}
-        </ul>
-	</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Select a Station{% endblock %}
+{% block content%}
+<ul>
+    {% for stop in stops %}
+        <li><a href="/query?stop={{ stop.num }}">
+            {{ stop.desc }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
