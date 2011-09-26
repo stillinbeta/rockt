@@ -1,4 +1,0 @@
-cron:
-- description: Retrieve Position Data
-  url: /update
-  schedule: every 5 minutes
