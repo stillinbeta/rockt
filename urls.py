@@ -6,10 +6,12 @@ from django.views.generic import list_detail
 from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
+
 urlpatterns = patterns('',
 
         (r'^admin/', include(admin.site.urls)),
 	(r'^$', direct_to_template, {'template' : 'map.html'}),
+    (r'^locations/$','cars.views.locations'),
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/home/sib/Devel/sibcom/static'}),
 
 )

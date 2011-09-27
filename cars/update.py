@@ -1,58 +1,50 @@
-from google.appengine.ext import webapp
-from google.appengine.api import urlfetch,apiproxy_stub_map
-from google.appengine.ext import db
+from urllib import urlopen
 from xml.dom import minidom
-from models import StreetcarLocation
-routes = range(501,513)
-api_url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 
-route_list = []
-for route in routes:
-    route_list.append(str(route)) 
+import Geohash
 
-def remove_out_of_service(cars_update):
-    query = StreetcarLocation.all(keys_only=True)
-    all_streetcars = query.filter("in_service = ",True).run()
+from rockt.cars.models import Car
+
+API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
+
+def remove_out_of_service(cars_updated):
+    all_streetcars = Car.objects.filter(active__exact = True).all()
 
     to_remove = []
     for streetcar in all_streetcars:
-        if streetcar not in cars_updated:
-            to_remove.append(streetcar)
-            print "Removing inactive car %s" % streetcar.name()
+        if streetcar.number not in cars_updated:
+            to_remove.append(streetcar.number)
+            print "Removing inactive car %s" % streetcar.number
     if to_remove:
-        streetcars = db.get(to_remove)
-        for streetcar in streetcars:
-            streetcar.in_service = False
-        db.put(streetcars)
+        for number in to_remove:
+            car = Car(number=number, active=False)
+            car.save()
 
-def update_streetcars():
+
+def update_streetcars(route_list):
     cars_updated = []
 
-    response = urlfetch.fetch(api_url)
-    tree = minidom.parseString(response.content)
+    response = urlopen(API_URL)
+    tree = minidom.parse(response)
 
     for vehicle in tree.getElementsByTagName('vehicle'):
         if (vehicle.getAttribute('routeTag') in route_list and
             vehicle.getAttribute('predictable') == u'true'):
             car_id = vehicle.getAttribute('id')
-            car = StreetcarLocation.get_or_insert(key_name=car_id,
-                location=db.GeoPt('0,0'))
-            car.location = db.GeoPt(vehicle.getAttribute('lat'),
-                            vehicle.getAttribute('lon'))
+            car = Car()
+            car.number = vehicle.getAttribute('id')
+            car.latitude = vehicle.getAttribute('lat')
+            car.longitude = vehicle.getAttribute('lon')
             car.route = vehicle.getAttribute('routeTag')
-            car.in_service = True
-            car.update_location()
-            cars_updated.append(car.key())
+            car.active = True
+            car.geohash = Geohash.encode(float(car.latitude),
+                                         float(car.longitude))
+            cars_updated.append(int(car.number))
             print "Car %s in service" % car_id
-            car.put()
+            car.save()
 
     return cars_updated 
 
-print "Content-Type: text/plain"
-cars_updated = update_streetcars()
-print "Update is Complete, %d cars in service" % len(cars_updated)
-remove_out_of_service(cars_updated)
-print "Removal Complete"
 
 
 
