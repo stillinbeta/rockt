@@ -1,3 +1,5 @@
 Think monopoly meets foursquare with streetcars. 
 
-Required libraries: http://code.google.com/p/geomodel/
+Uses Django, currently with MongoDB. 
+
+Requires geohash library: pip install geohash
