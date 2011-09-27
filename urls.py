@@ -13,7 +13,7 @@ from rockt.stops.views import StopDetailedView
 
 urlpatterns = patterns('',
 
-        (r'^admin/', include(admin.site.urls)),
+    (r'^admin/', include(admin.site.urls)),
 	(r'^$', direct_to_template, {'template' : 'map.html'}),
     (r'^locations/$','cars.views.locations'),
     (r'^car/(?P<slug>.+)/$',
@@ -21,6 +21,8 @@ urlpatterns = patterns('',
             model = Car,
             slug_field = 'number',
             template_name = 'car.html',)),
+    (r'^stops/locate/$', direct_to_template, {'template' : 'geolocation.html'}),
+    (r'^stops/locate/(?P<lat>.+)/(?P<lon>.+)/', 'stops.views.locate'),
     (r'^stops/$',
         ListView.as_view(
             model = Stop,

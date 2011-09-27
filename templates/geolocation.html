@@ -9,9 +9,9 @@
         <script type="text/javascript">
             function success(position) {
 				console.log(position);
-                document.location.href  = "/query/find?lat="+
+                document.location.href  = "/stops/locate/"+
                     position.coords.latitude +
-					"&lon="+position.coords.longitude;
+					"/"+position.coords.longitude + "/";
             }
             function failure(msg) {
                 alert(msg.message);
