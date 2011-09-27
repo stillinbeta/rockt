@@ -65,7 +65,6 @@ def update_stops(path_to_gtfs):
 
     count = 0
     Stop.objects.all().delete()
-    return
     for stop in stop_set:
         new_stop = Stop()
         new_stop.number = stop[0]

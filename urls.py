@@ -8,6 +8,7 @@ admin.autodiscover()
 
 from rockt.cars.models import Car
 from rockt.stops.models import Stop
+from rockt.stops.views import StopDetailedView
 
 
 urlpatterns = patterns('',
@@ -20,6 +21,9 @@ urlpatterns = patterns('',
             model = Car,
             slug_field = 'number',
             template_name = 'car.html',)),
+    (r'^stop/(?P<slug>.+)/$',
+        StopDetailedView.as_view(
+            template_name = 'cars_nearby.html')),
 	(r'^static/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/home/sib/Devel/sibcom/static'}),
 
 )
