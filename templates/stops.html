@@ -3,8 +3,8 @@
 {% block content%}
 <ul>
     {% for stop in stops %}
-        <li><a href="/query?stop={{ stop.num }}">
-            {{ stop.desc }}</a></li>
+        <li><a href="/stop/{{ stop.number }}">
+            {{ stop.description }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

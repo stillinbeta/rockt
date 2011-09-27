@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 
 #Django View Helpers
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
@@ -21,6 +21,11 @@ urlpatterns = patterns('',
             model = Car,
             slug_field = 'number',
             template_name = 'car.html',)),
+    (r'^stops/$',
+        ListView.as_view(
+            model = Stop,
+            context_object_name='stops',
+            template_name = 'stops.html')),
     (r'^stop/(?P<slug>.+)/$',
         StopDetailedView.as_view(
             template_name = 'cars_nearby.html')),
