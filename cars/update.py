@@ -33,12 +33,14 @@ def update_streetcars(route_list):
             car_id = vehicle.getAttribute('id')
             car = Car()
             car.number = vehicle.getAttribute('id')
-            car.latitude = vehicle.getAttribute('lat')
-            car.longitude = vehicle.getAttribute('lon')
+         #   car.location = (float(vehicle.getAttribute('latitude')),
+         #                   float(vehicle.getAttribute('longitude')))
+            car.location = [float(vehicle.getAttribute(i)) for i in (
+                                                            'lon',
+                                                            'lat')]
             car.route = vehicle.getAttribute('routeTag')
             car.active = True
-            car.geohash = Geohash.encode(float(car.latitude),
-                                         float(car.longitude))
+            car.geohash = Geohash.encode(*car.location)
             cars_updated.append(int(car.number))
             print "Car %s in service" % car_id
             car.save()

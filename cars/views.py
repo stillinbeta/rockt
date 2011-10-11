@@ -10,7 +10,8 @@ def locations(request):
     cars = Car.objects.filter(active__exact=True).all()
     car_info = dict()
     for car in cars:
-        car_info[car.number] ={'lat' : car.latitude, 'lon' : car.longitude} 
+        car_info[car.number] = {'lon' : car.location[0],
+                                't' : car.location[1]} 
                                              
     return HttpResponse(json.dumps(car_info),mimetype='application/json')
 
