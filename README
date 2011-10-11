@@ -1,5 +1,0 @@
-Think monopoly meets foursquare with streetcars. 
-
-Uses Django, currently with MongoDB. 
-
-Requires geohash library: pip install geohash
