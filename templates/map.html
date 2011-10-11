@@ -4,8 +4,12 @@
 	<title>Streetcars</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="initial-scale=1.0;  maximum-scale=1.0;" />
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" 
+        src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js">
+    </script>
+	<script type="text/javascript" 
+        src="http://maps.google.com/maps/api/js?sensor=false">
+    </script>
 	<style type="text/css">
 		html, body, #map{
 			width:100%;
@@ -17,19 +21,22 @@
 	<script type="text/javascript">
 		var map;
 		var markers;
+
 		
 		function initialize() {
-			var latlng = new google.maps.LatLng(43.67457221164316,-79.3884249267578);
-			var myOptions = {
+			var latlng = new google.maps.LatLng(43.674572211,-79.38842492);
+			var myOpts = {
 			  zoom: 11,
 			  center: latlng,
 			  mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
-			map = new google.maps.Map(document.getElementById("map"), myOptions);
-            var navControlDiv = document.createElement('div');
-            var navControl = new NavControl(navControlDiv,map); 
-            navControlDiv.index=1;
-              map.controls[google.maps.ControlPosition.TOP_RIGHT].push(navControlDiv); 
+			map = new google.maps.Map(document.getElementById("map"), myOpts);
+            var navControl = document.createElement('div');
+            var navControlObj = new NavControl(navControl,map); 
+            controlPosition = google.maps.ControlPosition.TOP_RIGHT;
+            navControl.index=1;
+
+            map.controls[controlPosition].push(navControl); 
 
 			$.getJSON("/locations/", {}, function(data) {
                 markers = []
@@ -40,6 +47,7 @@
                         map: map,
                         title: car
                     }));
+                    console.log(data[car]);
                 }
                 if ( markers.length ) {
 				    fitMarkers(map, markers);
@@ -61,7 +69,8 @@
             controlDiv.style.backgroundColor='white';
             controlDiv.style.border = '1px solid black';
             controlDiv.style.borderTop = 'none';
-            controlDiv.innerHTML = '<a href="/stops/">Station List</a> <a href="/stops/locate/">Station Finder</a>';
+            controlDiv.innerHTML = '<a href="/stops/">Station List</a>'
+            + ' <a href="/stops/locate/">Station Finder</a>';
         }
 	</script>
 </head>
