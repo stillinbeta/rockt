@@ -69,14 +69,13 @@ def update_stops(path_to_gtfs):
         new_stop = Stop()
         new_stop.number = stop[0]
         new_stop.description = stop[1].title() #Make the description easy to read
-        new_stop.latitude= stop[2]
-        new_stop.longitude = stop[3]
+        #MongoDB indices are lon/lat
+        new_stop.location = (float(stop[3]),float(stop[2])) 
         new_stop.route = int(stop[4])
-        new_stop.geohash =  Geohash.encode(float(new_stop.latitude),
-                                           float(new_stop.longitude))
         new_stop.save()
         count += 1
         print new_stop.description + " imported."
+        print new_stop.location
 
     print "importation complete. %d stops imported" % count
         

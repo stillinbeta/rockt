@@ -5,7 +5,7 @@
     <img src="http://maps.google.com/maps/api/staticmap?center={{ stop.location }}
         &maptype=roadmap
         &size=512x512
-        &markers=color:blue%7Clabel:S%7C{{stop.latitude}},{{stop.longitude}}
+        &markers=color:blue%7Clabel:S%7C{{stop.location.1}},{{stop.location.0}}
         {% for car in nearby_cars %}
         &markers=color:red%7Clabel:C%7C{{car.location.1}},{{car.location.0}}
         {% endfor %}

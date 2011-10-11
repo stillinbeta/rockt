@@ -6,12 +6,12 @@
             &size=512x512
             &markers=color:blue%7Clabel:U%7C{{ lat }},{{ lon }}
             {% for stop in stops %}
-            &markers=color:red%7C{{stop.latitude}},{{stop.longitude}}
+            &markers=color:red%7C{{ stop.location.1 }},{{ stop.location.0 }}
             {% endfor %}
             &sensor=false" />
         <ul>
             {% for stop in stops %}
-                <li><a href="/query?stop={{ stop.number }}">
+                <li><a href="/stop/{{ stop.number }}/">
                     {{ stop.description }}</a></li>
             {% endfor %}
         </ul>
