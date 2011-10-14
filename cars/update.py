@@ -3,7 +3,7 @@ from xml.dom import minidom
 
 import Geohash
 
-from rockt.cars.models import Car
+from rockt.cars.models import Car,FareInfo
 
 API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 
@@ -31,16 +31,19 @@ def update_streetcars(route_list):
         if (vehicle.getAttribute('routeTag') in route_list and
             vehicle.getAttribute('predictable') == u'true'):
             car_id = vehicle.getAttribute('id')
-            car = Car()
+            try: 
+                car = Car.objects.get(number=car_id)
+            except Car.DoesNotExist:
+                car = Car()
+                car.owner_fares = FareInfo()
+                car.total_fares = FareInfo()
+                
             car.number = vehicle.getAttribute('id')
-         #   car.location = (float(vehicle.getAttribute('latitude')),
-         #                   float(vehicle.getAttribute('longitude')))
             car.location = [float(vehicle.getAttribute(i)) for i in (
                                                             'lon',
                                                             'lat')]
             car.route = vehicle.getAttribute('routeTag')
             car.active = True
-            car.geohash = Geohash.encode(*car.location)
             cars_updated.append(int(car.number))
             print "Car %s in service" % car_id
             car.save()
