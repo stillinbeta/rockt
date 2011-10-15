@@ -8,4 +8,7 @@ which depends on
 [django-norel](http://www.allbuttonspressed.com/projects/django-nonrel) and 
 [djangotoolbox](http://www.allbuttonspressed.com/projects/djangotoolbox). 
 
+Also requires geopy:
+    pip install geopy
+
 
