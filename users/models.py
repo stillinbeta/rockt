@@ -7,7 +7,7 @@ from djangotoolbox.fields import EmbeddedModelField,ListField
 class Riding(models.Model):
     car = models.ForeignKey('cars.Car')
     boarded = models.ForeignKey('stops.Stop')
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField(auto_now=True)
 
 class UserProfile(models.Model):
     balance = models.IntegerField()

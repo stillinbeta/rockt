@@ -18,8 +18,7 @@ class StopDetailedView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(StopDetailedView,self).get_context_data(**kwargs)
         
-        cars =  Car.objects.find_nearby(context['object'].route,
-                                        context['object'].location)[:LIMIT]
+        cars =  Car.objects.find_nearby(context['object'])[:LIMIT]
         context['nearby_cars'] = cars
         return context
 
