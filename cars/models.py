@@ -1,14 +1,13 @@
 from django.db import models
 from pymongo import GEO2D
+from geopy.distance import distance
 from djangotoolbox.fields import ListField,EmbeddedModelField 
 from django_mongodb_engine.contrib import MongoDBManager
 
 
-from rockt.users.models import UserProfile
-
 MAX_DISTANCE = ''
 STREETCAR_PRICE = 400
-STREETCAR_FARE = 3
+STREETCAR_FARE_RATE = 2
 
 # Create your models here.
 
@@ -30,7 +29,7 @@ class Car(models.Model):
     location = ListField() #(lon, lat)
 
     #Financial information fields 
-    owner = models.ForeignKey(UserProfile,null=True)
+    owner = models.ForeignKey('users.UserProfile',null=True)
     owner_fares = EmbeddedModelField(FareInfo)
     total_fares = EmbeddedModelField(FareInfo)
     
@@ -47,12 +46,14 @@ class Car(models.Model):
         profile.balance -= STREETCAR_PRICE
         profile.save()
     
-    def ride(self,user):
+    def ride(self,user,on,off):
         #You don't have to pay for your own streetcars
         if user == self.owner:
             fare_paid = 0
         else:
-            fare_paid  = STREETCAR_FARE
+           #geopy is lat,lon, mongo is lon,lat
+           traveled = distance(*(car.location[::-1] for car in (on,off))) 
+           fare_paid = round(traveled.kilometers * STREETCAR_FARE_RATE)
 
         for fare_info in (self.owner_fares,self.total_fares):
             fare_info.riders += 1
