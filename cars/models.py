@@ -8,6 +8,7 @@ from rockt.users.models import UserProfile
 
 MAX_DISTANCE = ''
 STREETCAR_PRICE = 400
+STREETCAR_FARE = 3
 
 # Create your models here.
 
@@ -22,12 +23,13 @@ class CarLocatorManager(MongoDBManager):
                                 'route':route})
 
 class Car(models.Model):
+    #Location information fields
     number = models.PositiveIntegerField(db_index=True)
     route = models.IntegerField(null=True)
     active = models.BooleanField()
-    location = ListField()
+    location = ListField() #(lon, lat)
 
-    
+    #Financial information fields 
     owner = models.ForeignKey(UserProfile,null=True)
     owner_fares = EmbeddedModelField(FareInfo)
     total_fares = EmbeddedModelField(FareInfo)
@@ -35,7 +37,7 @@ class Car(models.Model):
     
     objects = CarLocatorManager()
 
-    def purchase(self,user):
+    def sell_to(self,user):
         profile = user.get_profile()
         if profile.balance < STREETCAR_PRICE:
             raise UserProfile.InsufficientFundsException
@@ -45,5 +47,23 @@ class Car(models.Model):
         profile.balance -= STREETCAR_PRICE
         profile.save()
     
+    def ride(self,user):
+        #You don't have to pay for your own streetcars
+        if user == self.owner:
+            fare_paid = 0
+        else:
+            fare_paid  = STREETCAR_FARE
+
+        for fare_info in (self.owner_fares,self.total_fares):
+            fare_info.riders += 1
+            fare_info.revenue += fare_paid 
+        self.save()
+
+        profile = user.get_profile()
+        profile.balance -= fare_paid
+        profile.save()
+
+
+             
     class MongoMeta:
         indexes = [{'fields': [('location',GEO2D),'route']}]
