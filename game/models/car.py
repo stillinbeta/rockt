@@ -4,7 +4,7 @@ from geopy.distance import distance
 from djangotoolbox.fields import ListField,EmbeddedModelField 
 from django_mongodb_engine.contrib import MongoDBManager
 
-from users.models import UserProfile
+from userprofile import UserProfile
 
 
 MAX_DISTANCE = ''
@@ -30,7 +30,7 @@ class Car(models.Model):
     location = ListField() #(lon, lat)
 
     #Financial information fields 
-    owner = models.ForeignKey('users.UserProfile',null=True)
+    owner = models.ForeignKey('game.UserProfile',null=True)
     owner_fares = EmbeddedModelField(FareInfo)
     total_fares = EmbeddedModelField(FareInfo)
     
@@ -76,3 +76,6 @@ class Car(models.Model):
              
     class MongoMeta:
         indexes = [{'fields': [('location',GEO2D),'route']}]
+
+    class Meta:
+        app_label = "game"

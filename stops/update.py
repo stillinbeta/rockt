@@ -8,7 +8,7 @@ from zipfile import ZipFile
 
 import Geohash
 
-from rockt.stops.models import Stop
+from game.models import Stop
 
 GTFS_URL = 'http://opendata.toronto.ca/TTC/routes/OpenData_TTC_Schedules.zip'
 

@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 from djangotoolbox.fields import EmbeddedModelField,ListField
 
 
+
 #Currenty checked in
 class Riding(models.Model):
-    car = models.ForeignKey('cars.Car')
-    boarded = models.ForeignKey('stops.Stop')
+    car = models.ForeignKey('game.Car')
+    boarded = models.ForeignKey('game.Stop')
     time = models.DateTimeField(auto_now=True)
 
 class UserProfile(models.Model):
@@ -34,3 +35,6 @@ class UserProfile(models.Model):
     #Thrown when you can't afford something
     class InsufficientFundsException(Exception):
         pass
+
+    class Meta:
+        app_label = "game"

@@ -1,20 +1,11 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from datetime import datetime,timedelta
 
-
 from django.test import TestCase
-from stops.models import Stop
 from django.contrib.auth.models import User 
-from users.models import UserProfile
-from cars.models import STREETCAR_FARE_RATE,STREETCAR_PRICE, Car, FareInfo
 
-class UserProfileTest(TestCase):
+from game.models import Car, UserProfile, Stop, FareInfo
+
+class UserProfileTests(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='joe',
                                         email='joe@bloggs.com',

@@ -77,9 +77,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
    # 'django.contrib.sessions',
    # 'django.contrib.sites',
-    'rockt.cars',
-    'rockt.stops',
-    'rockt.users'
+    'rockt.game',
 )
 
-AUTH_PROFILE_MODULE = 'users.UserProfile'
+AUTH_PROFILE_MODULE = 'game.UserProfile'

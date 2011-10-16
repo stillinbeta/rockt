@@ -3,7 +3,7 @@ from xml.dom import minidom
 
 import Geohash
 
-from rockt.cars.models import Car,FareInfo
+from game.models import Car,FareInfo
 
 API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 

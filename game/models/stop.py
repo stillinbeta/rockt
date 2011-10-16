@@ -17,3 +17,6 @@ class Stop(models.Model):
     class MongoMeta:
         indexes = [{'fields': [('location',GEO2D)]}]
 
+    class Meta:
+        app_label = "game"
+
