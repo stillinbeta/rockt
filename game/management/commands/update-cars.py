@@ -2,21 +2,16 @@ from urllib import urlopen
 from xml.dom import minidom
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 
 from game.models import Car,FareInfo
 
-API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 
 class Command(BaseCommand):
     help = 'Update the positions of the streetcars'
 
     def handle(self,*args,**kwargs):
-
-        routes = range(501,513)
-        route_list = []
-        for route in routes:
-            route_list.append(str(route)) 
-
+        route_list = settings.NEXTBUS_ROUTE_LIST
         cars_updated = self.update_streetcars(route_list)
         self.stdout.write("Update is Complete, %d cars in service\n" 
             % len(cars_updated))
@@ -42,7 +37,7 @@ class Command(BaseCommand):
     def update_streetcars(self,route_list):
         cars_updated = []
 
-        response = urlopen(API_URL)
+        response = urlopen(settings.NEXTBUS_API_URL)
         tree = minidom.parse(response)
 
         for vehicle in tree.getElementsByTagName('vehicle'):

@@ -8,10 +8,9 @@ from zipfile import ZipFile
 from shutil import rmtree
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 
 from game.models import Stop
-
-GTFS_URL = 'http://opendata.toronto.ca/TTC/routes/OpenData_TTC_Schedules.zip'
 
 class Command(BaseCommand):
     help = 'Update the location data for the stops'
@@ -29,9 +28,10 @@ class Command(BaseCommand):
             rmtree(tmpdir)
 
     def retrieve_data(self,tmpdir):
+        gtfs_url = settings.GTFS_URL
         datafilename = tmpdir + '/data.zip'
         datafile = open(datafilename,'w') 
-        request = urlopen(GTFS_URL)
+        request = urlopen(gtfs_url)
         for line in request:
             datafile.write(line)
         datafile.close() 
