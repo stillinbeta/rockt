@@ -1,15 +1,13 @@
 from django.db import models
 from pymongo import GEO2D
-from geopy.distance import distance
 from djangotoolbox.fields import ListField,EmbeddedModelField 
 from django_mongodb_engine.contrib import MongoDBManager
 
 from userprofile import UserProfile
+from game.rules import find_fare, get_streetcar_price
 
 
-MAX_DISTANCE = ''
 STREETCAR_PRICE = 400
-STREETCAR_FARE_RATE = 2
 
 # Create your models here.
 
@@ -38,29 +36,24 @@ class Car(models.Model):
     objects = CarLocatorManager()
 
     def sell_to(self,user):
+        price = get_streetcar_price(user, self)
         profile = user.get_profile()
-        if profile.balance < STREETCAR_PRICE:
+        if profile.balance < price:
             raise UserProfile.InsufficientFundsException
         self.owner = profile
         self.owner_fares = FareInfo()
         self.save()
-        profile.balance -= STREETCAR_PRICE
+        profile.balance -= price 
         profile.save()
     
     def ride(self,user,on,off):
         profile = user.get_profile()
         #You don't have to pay for your own streetcars
         insufficient_funds = False
-        if profile == self.owner:
-            fare_paid = 0
-        else:
-           #geopy is lat,lon, mongo is lon,lat
-           traveled = distance(*(car.location[::-1] for car in (on,off))) 
-           fare_paid = round(traveled.kilometers * STREETCAR_FARE_RATE)
-
-           if fare_paid > profile.balance:
-               fare_paid = 0
-               insufficient_funds = True
+        fare_paid  = find_fare(user, self, on, off) 
+        if fare_paid > profile.balance:
+           fare_paid = 0
+           insufficient_funds = True
 
         for fare_info in (self.owner_fares,self.total_fares):
             fare_info.riders += 1
