@@ -8,11 +8,16 @@ from game.models import Car, FareInfo
 
 XML_FILE = os.path.dirname(__file__) + '/test-updatecars.xml' 
 
+#can't have any output clogging our unit testing
+class NullStream:
+    def write(self, string):
+        pass
+
 class UpdateCarsTests(TestCase):
     def setUp(self):
         settings.NEXTBUS_API_URL = XML_FILE
         settings.NEXTBUS_ROUTE_LIST = ["501","511"]
-        management.call_command('updatecars')
+        management.call_command('updatecars',stdout=NullStream())
 
     def test_only_two_imported(self):
         self.assertEquals(Car.objects.count(),2)
@@ -32,7 +37,7 @@ class UpdateCarsTests(TestCase):
         self.assertItemsEqual(alrv.location, [-79.281281, 43.673717])
     
     def test_old_cars_not_added_twice(self):
-        management.call_command('updatecars')
+        management.call_command('updatecars',stdout=NullStream())
         self.assertEquals(Car.objects.count(),2)
 
     def test_car_not_in_update_marked_inactive(self):
@@ -43,5 +48,5 @@ class UpdateCarsTests(TestCase):
                            active=True,
                            owner_fares=FareInfo(),
                            total_fares=FareInfo()) 
-        management.call_command('updatecars')
+        management.call_command('updatecars',stdout=NullStream())
         self.assertFalse(Car.objects.get(number=number).active)
