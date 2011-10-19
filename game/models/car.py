@@ -4,6 +4,7 @@ from djangotoolbox.fields import ListField,EmbeddedModelField
 from django_mongodb_engine.contrib import MongoDBManager
 
 from userprofile import UserProfile
+from event import Event
 from game.rules import find_fare, get_streetcar_price
 
 
@@ -36,6 +37,7 @@ class Car(models.Model):
     objects = CarLocatorManager()
 
     def sell_to(self,user):
+        old_user = self.owner
         price = get_streetcar_price(user, self)
         profile = user.get_profile()
         if profile.balance < price:
@@ -44,7 +46,10 @@ class Car(models.Model):
         self.owner_fares = FareInfo()
         self.save()
         profile.balance -= price 
+        
+        Event.objects.add_car_sold(self,user, price, self._get_owner_user()) 
         profile.save()
+        
     
     def ride(self,user,on,off):
         profile = user.get_profile()
@@ -59,12 +64,19 @@ class Car(models.Model):
             fare_info.riders += 1
             fare_info.revenue += fare_paid 
         self.save()
+        
+        Event.objects.add_car_ride(user, self._get_owner_user(), self, 
+                                   on, off, fare_paid) 
 
         if (insufficient_funds):
             raise UserProfile.InsufficientFundsException
         profile.balance -= fare_paid
         profile.save()
 
+    def _get_owner_user(self):
+        if self.owner:
+            return self.owner.user
+        return None
 
              
     class MongoMeta:

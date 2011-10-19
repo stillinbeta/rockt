@@ -1,7 +1,9 @@
+import datetime
+
 from django.test import TestCase
 from django.contrib.auth.models import User 
 
-from game.models import Car,Stop,UserProfile,FareInfo
+from game.models import Car, Stop, UserProfile, FareInfo, Event
 from game.rules import find_fare, get_streetcar_price 
 
 class CarTests(TestCase):
@@ -54,6 +56,19 @@ class CarTests(TestCase):
         self.assertEqual(self.close.owner_fares.riders,0)
         self.assertEqual(self.close.owner_fares.revenue,0)
         self.assertEqual(self.close.owner,profile)
+    
+    def test_sell_to_creates_event(self):
+        profile = self.user.get_profile()
+        profile.balance = 10000000 #hopefully we never get hyperinflation
+        profile.save()
+        self.close.sell_to(self.user)
+
+        event = Event.objects.filter(event='car_sold')[0]  
+        self.assertAlmostEquals(datetime.date.today(),
+                                event.date,
+                                datetime.timedelta(seconds=1))
+        self.assertEquals(event.data['car'], self.close.number)
+
     def test_find_nearby(self):
         nearby = Car.objects.find_nearby(self.bathurst_station).all()
 
@@ -105,3 +120,20 @@ class CarTests(TestCase):
         self.assertEqual(self.close.owner_fares.revenue,old_owner_rev)
         self.assertEqual(self.close.total_fares.revenue,old_total_rev)
         self.assertEqual(self.user.get_profile().balance,old_balance)
+
+    def test_ride_creates_event(self):
+        #Ensure no fare issues 
+        self.close.owner = self.user.get_profile()
+        self.close.save()
+
+        self.close.ride(self.user,
+                        self.bathurst_station,
+                        self.bathurst_and_king)
+
+        event = Event.objects.filter(event='car_ride')[0]
+        
+        self.assertAlmostEquals(datetime.date.today(),
+                                event.date,
+                                datetime.timedelta(seconds=1))
+        self.assertEquals(event.data['car'], self.close.number) 
+        self.assertEquals(event.data['rider'], self.user.username)
