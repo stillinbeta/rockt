@@ -1,0 +1,6 @@
+<body copyright="All data copyright Toronto Transit Commission 2011.">
+    <vehicle id="1049" routeTag="94" dirTag="94_1_94" lat="43.662483" lon="-79.405197" secsSinceReport="15" predictable="true" heading="254" speedKmHr="0.0"/>
+    <vehicle id="8217" routeTag="7" dirTag="7_1_7" lat="43.754601" lon="-79.438187" secsSinceReport="15" predictable="true" heading="350" speedKmHr="0.0"/>
+    <vehicle id="4095" routeTag="501" dirTag="501_0_501A" lat="43.638817" lon="-79.445847" secsSinceReport="10" predictable="true" heading="76" speedKmHr="0.0"/>
+    <vehicle id="4212" routeTag="511" dirTag="501_0_501A" lat="43.673717" lon="-79.281281" secsSinceReport="12" predictable="true" heading="58" speedKmHr="0.0"/>
+</body>

@@ -50,35 +50,32 @@ class Command(BaseCommand):
 
         trip_set= set() #We use a set to avoid duplicates
         trip_routes = {} #Keep track of which route on which trip
-        trips = open(path_to_gtfs + '/trips.txt') 
-        for trip in trips:
-            trip = trip.split(',')
-            if trip[3][0:3] in route_nums: #trip[3] is route_name
-                trip_set.add(trip[2]) #trip[2] is trip_id
-                #store which route for which trip
-                trip_routes[trip[2]] = trip[3][0:3] 
-        trips.close()
+        with open(path_to_gtfs + '/trips.txt') as trips:
+            for trip in trips:
+                trip = trip.split(',')
+                if trip[3][0:3] in route_nums: #trip[3] is route_name
+                    trip_set.add(trip[2]) #trip[2] is trip_id
+                    #store which route for which trip
+                    trip_routes[trip[2]] = trip[3][0:3] 
 
         stop_id_set = set()
         stop_id_routes = {} #Continue to collect route information
-        stop_times = open(path_to_gtfs + '/stop_times.txt')
-        for stop_time in stop_times:
-            stop_time = stop_time.split(',')
-            if stop_time[0] in trip_set: #stop_time[0] is trip_id
-                stop_id_set.add(stop_time[3]) #stop_time[3] is stop_id
-                stop_id_routes[stop_time[3]] = trip_routes[stop_time[0]]
-        stop_times.close()
+        with open(path_to_gtfs + '/stop_times.txt') as stop_times:
+            for stop_time in stop_times:
+                stop_time = stop_time.split(',')
+                if stop_time[0] in trip_set: #stop_time[0] is trip_id
+                    stop_id_set.add(stop_time[3]) #stop_time[3] is stop_id
+                    stop_id_routes[stop_time[3]] = trip_routes[stop_time[0]]
 
         stop_set = set()
-        stops = open(path_to_gtfs + '/stops.txt')
-        for stop in stops:
-            stop = stop.split(',')
-            if stop[0] in stop_id_set:
-                arr = itertools.chain(stop[1:3],
-                                      stop[4:6],
-                                      [stop_id_routes[stop[0]]])
-                stop_set.add(tuple(arr))
-        stops.close()
+        with open(path_to_gtfs + '/stops.txt') as stops:
+            for stop in stops:
+                stop = stop.split(',')
+                if stop[0] in stop_id_set:
+                    arr = itertools.chain(stop[1:3],
+                                          stop[4:6],
+                                          [stop_id_routes[stop[0]]])
+                    stop_set.add(tuple(arr))
 
         count = 0
         Stop.objects.all().delete()
