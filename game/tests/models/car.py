@@ -11,6 +11,9 @@ class CarTests(TestCase):
         self.user = User.objects.create(username='joe',
                                         email='joe@bloggs.com',
                                         password='secret')
+        self.user2 = User.objects.create(username='heidi',
+                                         email='heidi@yahoo.com',
+                                         password='idieh')
         def create_car(loc, number,route=511, active=True):
             return Car.objects.create(
                 number=number,
@@ -83,7 +86,9 @@ class CarTests(TestCase):
     def test_ride(self):
         profile = self.user.get_profile()
         profile.balance = 10 * 100 
+        owner_profile = self.user2.get_profile()
         self.close.owner_fares=FareInfo()
+        self.close.owner=owner_profile
         self.close.total_fares=FareInfo(riders=1,revenue=15)
 
         total_fare = find_fare(self.user,
@@ -91,16 +96,21 @@ class CarTests(TestCase):
                                self.bathurst_station, 
                                self.bathurst_and_king,)
 
-        expected_balance = profile.balance - total_fare
+        expected_rider_balance = profile.balance - total_fare
+        expected_owner_balance = owner_profile.balance + total_fare
         self.close.ride(self.user,
                         self.bathurst_station,
                         self.bathurst_and_king)
 
-        self.assertEqual(self.user.get_profile().balance,expected_balance)
+        self.assertEqual(self.user.get_profile().balance,
+            expected_rider_balance)
+        self.assertEqual(self.user2.get_profile().balance,
+            expected_owner_balance)
         self.assertEqual(self.close.owner_fares.riders,1)
         self.assertEqual(self.close.owner_fares.revenue,total_fare)
         self.assertEqual(self.close.total_fares.riders,2)
         self.assertEqual(self.close.total_fares.revenue,15 + total_fare)
+
 
     def test_ride_own_car_doesnt_charge(self):
         profile = self.user.get_profile()

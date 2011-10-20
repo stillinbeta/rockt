@@ -73,6 +73,9 @@ class Car(models.Model,LocationClass):
             raise UserProfile.InsufficientFundsException
         profile.balance -= fare_paid
         profile.save()
+        if self.owner:
+            self.owner.balance += fare_paid
+            self.owner.save()
 
     def _get_owner_user(self):
         if self.owner:
