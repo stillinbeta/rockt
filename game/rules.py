@@ -17,3 +17,7 @@ def find_fare(user, car, on, off):
 def get_streetcar_price(user, car):
     #No rules here yet
     return 200
+
+
+def can_buy_car(user, car):
+    return car.owner is None

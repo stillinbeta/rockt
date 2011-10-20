@@ -2,14 +2,13 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from game.models import Car, Stop, UserProfile,FareInfo
-from game.rules import find_fare, get_streetcar_price
+from game.rules import find_fare, get_streetcar_price,can_buy_car
 
 class RulesTest(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='joe',
                                         email='joe@bloggs.com',
                                         password='secret')
-        UserProfile.objects.create(user=self.user, balance=0)
 
         self.bathurst_station = Stop.objects.create(
                             location=[ -79.411286, 43.666532 ],
@@ -53,3 +52,10 @@ class RulesTest(TestCase):
 
     def test_streetcar_price_is_two_hundred(self):
         self.assertEquals(get_streetcar_price(None, None),200)
+
+    def test_can_buy_car(self):
+        self.alrv.owner = None
+        self.assertTrue(can_buy_car(self.user, self.alrv))
+        self.alrv.owner = self.user.get_profile()
+        self.assertFalse(can_buy_car(self.user, self.alrv))
+
