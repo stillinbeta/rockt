@@ -11,8 +11,6 @@ class CarTests(TestCase):
         self.user = User.objects.create(username='joe',
                                         email='joe@bloggs.com',
                                         password='secret')
-        UserProfile.objects.create(user=self.user, balance=0)
-        
         def create_car(loc, number,route=511, active=True):
             return Car.objects.create(
                 number=number,

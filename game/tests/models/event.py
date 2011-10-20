@@ -11,7 +11,6 @@ class EventTests(TestCase):
         self.user2 = User.objects.create(username='heidi',
                                          email='heidi@yahoo.com',
                                          password='idieh')
-        
         self.bathurst_station = Stop.objects.create(
                             number='00112',
                             route='510',

@@ -10,7 +10,6 @@ class UserProfileTests(TestCase):
         self.user = User.objects.create(username='joe',
                                         email='joe@bloggs.com',
                                         password='secret')
-        UserProfile.objects.create(user=self.user, balance=0)
         
         self.bathurst_station = Stop.objects.create(
                             location=[ -79.411286, 43.666532 ],
