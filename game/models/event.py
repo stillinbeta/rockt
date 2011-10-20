@@ -1,6 +1,5 @@
 from django.db import models
 from djangotoolbox.fields import DictField
-from geopy.distance import distance
 
 class EventManager(models.Manager):
     def add_car_sold(self, car, user, price, old_user=None):
@@ -12,12 +11,9 @@ class EventManager(models.Manager):
         if old_user:
             data['old_user'] = old_user.username
         return self.create(event=event,data=data)
-    def add_car_ride(self, rider, owner, car, on, off, fare, traveled=None):
+    def add_car_ride(self, rider, owner, car, on, off, fare):
         ##TODO: Make more robust framework for measuring distances
-        if not traveled:
-            traveled = distance(*(stop.location[::-1] 
-                for stop in (on,off))).kilometers,
-
+        traveled = on.distance_to(off)
         event = 'car_ride'
         data = {'car':car.number,
                 'rider':rider.username,

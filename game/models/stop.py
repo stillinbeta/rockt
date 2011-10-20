@@ -3,11 +3,13 @@ from django_mongodb_engine.contrib import MongoDBManager
 from djangotoolbox.fields import ListField 
 from pymongo import GEO2D
 
+from location import LocationClass
+
 class StopLocatorManager(MongoDBManager):
     def find_nearby(self, location):
         return self.raw_query({'location':{'$near':location}})
 
-class Stop(models.Model):
+class Stop(models.Model,LocationClass):
     number = models.TextField()
     route = models.IntegerField()
     description = models.TextField()

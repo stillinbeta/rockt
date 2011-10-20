@@ -6,6 +6,7 @@ from django_mongodb_engine.contrib import MongoDBManager
 from userprofile import UserProfile
 from event import Event
 from game.rules import find_fare, get_streetcar_price
+from location import LocationClass
 
 
 STREETCAR_PRICE = 400
@@ -21,7 +22,7 @@ class CarLocatorManager(MongoDBManager):
         return self.raw_query({'location': {'$near':stop.location},
                                 'route':stop.route,'active':True})
 
-class Car(models.Model):
+class Car(models.Model,LocationClass):
     #Location information fields
     number = models.PositiveIntegerField(db_index=True)
     route = models.IntegerField(null=True)
