@@ -48,7 +48,7 @@ class Car(models.Model,LocationClass):
         self.save()
         profile.balance -= price 
         
-        Event.objects.add_car_sold(self,user, price, self._get_owner_user()) 
+        Event.objects.add_car_bought(self,user, price, self._get_owner_user()) 
         profile.save()
         
     

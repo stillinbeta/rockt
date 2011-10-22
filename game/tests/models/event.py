@@ -26,6 +26,21 @@ class EventTests(TestCase):
                                 owner_fares=FareInfo(),
                                 total_fares=FareInfo(),)
 
+    def test_add_car_bought_data_correct(self):
+        price = 150
+        event = Event.objects.add_car_bought(self.car,self.user,price) 
+        self.assertEquals(event.event, 'car_bought')
+        self.assertEquals(event.data['car'], self.car.number)
+        self.assertEquals(event.data['user'], self.user.username)
+        self.assertEquals(event.data['price'], price)
+    def test_add_car_old_user_only_added_if_present(self):
+        price = 150
+        event = Event.objects.add_car_bought(self.car,self.user,price) 
+        self.assertNotIn('old_user',event.data)  
+
+        event = Event.objects.add_car_bought(self.car,self.user,price,self.user2) 
+        self.assertEquals(event.data['old_user'],self.user2.username)
+   
     def test_add_car_sold_data_correct(self):
         price = 150
         event = Event.objects.add_car_sold(self.car,self.user,price) 
@@ -33,14 +48,7 @@ class EventTests(TestCase):
         self.assertEquals(event.data['car'], self.car.number)
         self.assertEquals(event.data['user'], self.user.username)
         self.assertEquals(event.data['price'], price)
-    def test_add_car_old_user_only_added_if_present(self):
-        price = 150
-        event = Event.objects.add_car_sold(self.car,self.user,price) 
-        self.assertNotIn('old_user',event.data)  
-
-        event = Event.objects.add_car_sold(self.car,self.user,price,self.user2) 
-        self.assertEquals(event.data['old_user'],self.user2.username)
-    
+ 
     def test_add_car_ride_data_accurate(self):
         fare = 120    
         event = Event.objects.add_car_ride(self.user, self.user2,

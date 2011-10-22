@@ -64,7 +64,7 @@ class CarTests(TestCase):
         profile.save()
         self.close.sell_to(self.user)
 
-        event = Event.objects.filter(event='car_sold')[0]  
+        event = Event.objects.filter(event='car_bought')[0]  
         self.assertAlmostEquals(datetime.date.today(),
                                 event.date,
                                 datetime.timedelta(seconds=1))
