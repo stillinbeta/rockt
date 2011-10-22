@@ -64,11 +64,37 @@ class CarTests(TestCase):
         profile.save()
         self.close.sell_to(self.user)
 
-        event = Event.objects.filter(event='car_bought')[0]  
+        self.assertEventCreated('car_bought',self.close)
+    def test_buy_back_credits_account(self):
+        profile = self.user.get_profile()
+        expected_balance = profile.balance + get_streetcar_price(self.user,
+                                                                 self.close)
+
+        self.close.owner = profile
+        self.close.save()
+        self.close.buy_back()
+        
+        self.assertEqual(profile.balance, expected_balance)
+        self.assertEqual(self.close.owner_fares.riders,0)
+        self.assertEqual(self.close.owner_fares.revenue,0)
+        self.assertEqual(self.close.owner, None) 
+
+    def test_buy_back_creates_event(self):
+        profile = self.user.get_profile()
+        self.close.owner = profile
+        self.close.save()
+        self.close.buy_back()
+
+        self.assertEventCreated('car_sold',self.close)
+
+
+    def assertEventCreated(self, event_name, car):
+        event = Event.objects.filter(event='car_sold')[0]
         self.assertAlmostEquals(datetime.date.today(),
                                 event.date,
                                 datetime.timedelta(seconds=1))
-        self.assertEquals(event.data['car'], self.close.number)
+        self.assertEquals(event.data['car'], car.number)
+        
 
     def test_find_nearby(self):
         nearby = Car.objects.find_nearby(self.bathurst_station).all()
