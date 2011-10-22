@@ -5,15 +5,19 @@ from django.contrib import admin
 from django.views.generic import DetailView, ListView
 from django.views.generic.simple import direct_to_template
 admin.autodiscover()
+from djangorestframework.views import InstanceModelView 
 
 from rockt.game.models import Car,Stop
 from rockt.game.views import StopDetailedView
+from rockt.game.resources import StopResource
 
 
 urlpatterns = patterns('',
 
     (r'^admin/', include(admin.site.urls)),
 	(r'^$', direct_to_template, {'template' : 'map.html'}),
+    (r'^api/stop/(?P<number>[^/]+)/$', 
+        InstanceModelView.as_view(resource=StopResource)),
     (r'^locations/$','game.views.car_locations'),
     (r'^car/(?P<slug>.+)/$',
         DetailView.as_view(

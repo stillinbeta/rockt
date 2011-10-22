@@ -1,8 +1,10 @@
 import json 
 
+from django.contrib.auth.models import User
 from django.views.generic import DetailView
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from djangohttpdigest.decorators import protect_digest_model
 
 from game.models import Car, Stop
 
@@ -23,6 +25,7 @@ class StopDetailedView(DetailView):
         context['nearby_cars'] = cars
         return context
 
+@protect_digest_model(User, 'rockt', password_field='password', realm_field=None)
 def nearby_stops(request, lat, lon):
     stops = Stop.objects.find_nearby((float(lon),float(lat)))[:LIMIT]
     context = {'lat' : lat,
