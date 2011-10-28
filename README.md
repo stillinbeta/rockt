@@ -7,6 +7,7 @@ Install [django mongodb engine](http://django-mongodb.org/topics/setup.html),
 which depends on 
 [django-norel](http://www.allbuttonspressed.com/projects/django-nonrel) and 
 [djangotoolbox](http://www.allbuttonspressed.com/projects/djangotoolbox). 
+I am currently a little ahead of the upstream `django_mongodb_engine`, so it's safest to use mine.
 
 Also requires geopy:
     pip install geopy
