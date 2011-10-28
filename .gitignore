@@ -2,6 +2,10 @@
 *.pyc
 *.sw*
 
+#Virtualenv
 /bin/
 /include/
 /lib/
+
+#A file I use as a scratch pad
+testing.py

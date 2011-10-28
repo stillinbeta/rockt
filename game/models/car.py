@@ -48,10 +48,19 @@ class Car(models.Model,LocationClass):
         self.save()
         profile.balance -= price 
         
-        Event.objects.add_car_sold(self,user, price, self._get_owner_user()) 
+        Event.objects.add_car_bought(self,user, price, self._get_owner_user()) 
         profile.save()
         
-    
+    def buy_back(self):
+        price = get_streetcar_price(self.owner, self) 
+        owner = self.owner
+        self.owner = None
+        self.owner_fares = FareInfo()
+        self.save()
+        
+        owner.balance += price
+        Event.objects.add_car_sold(self, owner.user, price)
+        owner.save()
     def ride(self,user,on,off):
         profile = user.get_profile()
         #You don't have to pay for your own streetcars
