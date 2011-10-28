@@ -89,7 +89,7 @@ class CarTests(TestCase):
 
 
     def assertEventCreated(self, event_name, car):
-        event = Event.objects.filter(event='car_sold')[0]
+        event = Event.objects.filter(event=event_name)[0]
         self.assertAlmostEquals(datetime.date.today(),
                                 event.date,
                                 datetime.timedelta(seconds=1))

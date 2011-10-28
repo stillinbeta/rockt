@@ -25,6 +25,13 @@ class EventTests(TestCase):
                                 location=[ -79.402858, 43.644075 ],
                                 owner_fares=FareInfo(),
                                 total_fares=FareInfo(),)
+        self.car2 = Car.objects.create(
+                                number=4212,
+                                active=True,
+                                location=[ -79.402858, 43.644075 ],
+                                owner_fares=FareInfo(),
+                                total_fares=FareInfo(),)
+
 
     def test_add_car_bought_data_correct(self):
         price = 150
@@ -77,4 +84,24 @@ class EventTests(TestCase):
                                            self.bathurst_station,
                                            0)
         self.assertNotIn('owner',event.data)
+
+    def test_get_car_timeline_accurate(self):
+        price = 150
+        e1 = Event.objects.add_car_bought(self.car,self.user,price) 
+        e2 = Event.objects.add_car_ride(self.user, None,
+                                           self.car,
+                                           self.bathurst_and_king,
+                                           self.bathurst_station,
+                                           0)
+        e3 = Event.objects.add_car_ride(self.user, None,
+                                           self.car2,
+                                           self.bathurst_and_king,
+                                           self.bathurst_station,
+                                           0)
+        e4 = Event.objects.add_car_sold(self.car,self.user,price) 
         
+        es = Event.objects.get_car_timeline(self.car)
+        self.assertIn(e1, es)
+        self.assertIn(e2, es)
+        self.assertIn(e4, es)
+        self.assertNotIn(e3,es)

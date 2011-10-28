@@ -1,7 +1,8 @@
 from django.db import models
 from djangotoolbox.fields import DictField
+from django_mongodb_engine.contrib import MongoDBManager
 
-class EventManager(models.Manager):
+class EventManager(MongoDBManager):
     def add_car_bought(self, car, user, price, old_user=None):
         event = 'car_bought'
 
@@ -32,6 +33,8 @@ class EventManager(models.Manager):
         if owner:
             data['owner'] = owner.username
         return self.create(event=event,data=data)
+    def get_car_timeline(self, car):
+        return self.raw_query({'data.car':car.number})
 class Event(models.Model):
     event  = models.TextField()
     data = DictField()
@@ -41,6 +44,9 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['date']
+        app_label = "game"
+    class MongoMeta:
+        indexes = [{'fields':[('data.car',1)], 'sparse':True}]
    
          
         
