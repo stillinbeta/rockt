@@ -25,7 +25,7 @@ class StopDetailedView(DetailView):
         return context
 
 
-@protect_digest_model(User, 'rockt', password_field='password', realm_field=None)
+#@protect_digest_model(User, 'rockt', password_field='password', realm_field=None)
 def nearby_stops(request, lat, lon):
     stops = Stop.objects.find_nearby((float(lon), float(lat)))[:LIMIT]
     context = {'lat': lat,
