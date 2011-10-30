@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core import management
 from django.test import TestCase
 
-from game.models import Car, FareInfo
+from game.models import Car
 
 XML_FILE = os.path.dirname(__file__) + '/test-updatecars.xml' 
 
@@ -45,8 +45,6 @@ class UpdateCarsTests(TestCase):
         Car.objects.create(number=number,
                            route=511,
                            location=(0,0),
-                           active=True,
-                           owner_fares=FareInfo(),
-                           total_fares=FareInfo()) 
+                           active=True,)
         management.call_command('updatecars',stdout=NullStream())
         self.assertFalse(Car.objects.get(number=number).active)

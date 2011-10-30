@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from game.models import Car, Stop, UserProfile,FareInfo
+from game.models import Car, Stop, UserProfile
 from game.rules import find_fare, get_streetcar_price,can_buy_car
 
 class RulesTest(TestCase):
@@ -20,9 +20,7 @@ class RulesTest(TestCase):
         make_car = lambda number: Car.objects.create(
                                     number=number,
                                     active=True,
-                                    location=[ -79.402858, 43.644075 ],
-                                    owner_fares=FareInfo(),
-                                    total_fares=FareInfo(),)
+                                    location=[ -79.402858, 43.644075 ],)
         self.alrv = make_car(4211)
         self.clrv = make_car(4011)
 

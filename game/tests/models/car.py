@@ -19,9 +19,7 @@ class CarTests(TestCase):
                 number=number,
                 route=route,
                 active=active,
-                location=loc,
-                owner_fares=FareInfo(),
-                total_fares=FareInfo(),)
+                location=loc,)
 
         self.closest = create_car((-79.4110, 43.66449),4211)
         self.closer = create_car((-79.4065, 43.66449), 4212)

@@ -2,11 +2,23 @@ from django.db import models
 from pymongo import GEO2D
 from djangotoolbox.fields import ListField,EmbeddedModelField 
 from django_mongodb_engine.contrib import MongoDBManager
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from userprofile import UserProfile
 from event import Event
 from game.rules import find_fare, get_streetcar_price
 from location import LocationClass
+
+@receiver(pre_save)
+def add_fareinfo(sender, **kwargs):
+    if sender != Car:
+        return
+    car = kwargs.get('instance')
+    if not car.owner_fares:
+        car.owner_fares = FareInfo()
+    if not car.total_fares:
+        car.total_fares = FareInfo()
 
 
 STREETCAR_PRICE = 400

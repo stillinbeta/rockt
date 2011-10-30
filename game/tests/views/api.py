@@ -3,7 +3,7 @@ from base64 import b64encode
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from game.models import Car, Stop, FareInfo, UserProfile
+from game.models import Car, Stop, UserProfile
 
 class CheckInOutTests(TestCase):
     check_in_url = '/api/checkin/'
@@ -21,9 +21,7 @@ class CheckInOutTests(TestCase):
         self.car = Car.objects.create(
                                 number=4211,
                                 active=True,
-                                location=[ -79.402858, 43.644075 ],
-                                owner_fares=FareInfo(),
-                                total_fares=FareInfo(),)
+                                location=[ -79.402858, 43.644075 ],)
         
         self.stop= Stop.objects.create(number="00000",
                                        location=[ -79.402858, 43.644075 ],

@@ -3,7 +3,7 @@ from datetime import datetime,timedelta
 from django.test import TestCase
 from django.contrib.auth.models import User 
 
-from game.models import Car, UserProfile, Stop, FareInfo
+from game.models import Car, UserProfile, Stop
 
 class UserProfileTests(TestCase):
     def setUp(self):
@@ -20,9 +20,7 @@ class UserProfileTests(TestCase):
         self.car = Car.objects.create(
                                 number=4211,
                                 active=True,
-                                location=[ -79.402858, 43.644075 ],
-                                owner_fares=FareInfo(),
-                                total_fares=FareInfo(),)
+                                location=[ -79.402858, 43.644075 ],)
 
     def test_check_in(self):
         profile = self.user.get_profile()
