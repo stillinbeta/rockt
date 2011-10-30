@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User 
@@ -30,6 +31,7 @@ class CarTests(TestCase):
 
         
         self.bathurst_station = Stop.objects.create(
+                            number="00258",
                             location=[ -79.411286, 43.666532 ],
                             route=511)
         self.bathurst_and_king = Stop.objects.create(
@@ -98,6 +100,24 @@ class CarTests(TestCase):
         nearby = Car.objects.find_nearby(self.bathurst_station).all()
 
         self.assertSequenceEqual(nearby,[self.closest,self.closer,self.close])
+
+    def test_find_nearby_api(self):
+        api_url = '/api/stop/{}/'.format(self.bathurst_station.number)   
+
+        response = self.client.get(api_url)
+        self.assertEquals(response.status_code, 200)
+        data = json.loads(response.content)
+        for attr in ('number','route','description','location'):
+            self.assertEquals(data[attr], 
+                              getattr(self.bathurst_station,attr))
+        expected_nearby = [self.closest,self.closer,self.close]
+        self.assertEquals(len(data['cars_nearby']), len(expected_nearby))
+
+        for i in range(len(data['cars_nearby'])):
+            self.assertEquals(data['cars_nearby'][i]['number'],
+                              expected_nearby[i].number)
+            self.assertSequenceEqual(data['cars_nearby'][i]['location'],
+                                     expected_nearby[i].location)
 
     def test_ride_insufficient_fare_throws_exception(self):
         profile = self.user.get_profile()

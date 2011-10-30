@@ -1,6 +1,6 @@
 from djangorestframework.resources import ModelResource
 
-from game.models import Stop
+from game.models import Stop,Car
 
 class StopResource(ModelResource):
     model = Stop
