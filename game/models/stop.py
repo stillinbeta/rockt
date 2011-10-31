@@ -11,7 +11,7 @@ class StopLocatorManager(MongoDBManager):
 
 class Stop(models.Model,LocationClass):
     number = models.TextField()
-    route = models.IntegerField()
+    route = models.IntegerField(null=True)
     description = models.TextField()
     location = ListField()
 
