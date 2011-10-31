@@ -10,7 +10,7 @@ from djangorestframework.views import InstanceModelView
 from rockt.game.models import Car,Stop
 from rockt.game.views.web import StopDetailedView
 from rockt.game.resources import StopResource
-from rockt.game.views.api import CheckInView, CheckOutView
+from rockt.game.views.api import CheckInView, CheckOutView, StopFindView
 
 urlpatterns = patterns('',
 
@@ -18,6 +18,8 @@ urlpatterns = patterns('',
 	(r'^$', direct_to_template, {'template' : 'map.html'}),
     (r'^api/stop/(?P<number>[^/]+)/$', 
         InstanceModelView.as_view(resource=StopResource)),
+    (r'^api/stop/find/(?P<lat>[^/]+)/(?P<lon>[^/]+)/',
+        StopFindView.as_view()),
     (r'^api/checkin/$', CheckInView.as_view()),
     (r'^api/checkout/$', CheckOutView.as_view()),
     (r'^locations/$','game.views.web.car_locations'),

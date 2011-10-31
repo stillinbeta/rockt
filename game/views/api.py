@@ -35,4 +35,14 @@ class CheckOutView(AuthRequiredView):
             self.user.get_profile().check_out(stop)
             return {'status': 'ok'}
         except UserProfile.NotCheckedInException:
-            raise ErrorResponse(400, {'detail':'User is not checked in'})
+            raise ErrorResponse(400, {'detail': 'User is not checked in'})
+
+
+class StopFindView(View):
+    def get(self, request, lat, lon):
+        try:
+            location = (float(lon), float(lat))
+        except ValueError:
+            raise ErrorResponse(400, {'detail': 'Invalid Coordinates'})
+
+        return Stop.objects.find_nearby(location)

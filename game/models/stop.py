@@ -10,7 +10,7 @@ class StopLocatorManager(MongoDBManager):
         return self.raw_query({'location':{'$near':location}})
 
 class Stop(models.Model,LocationClass):
-    number = models.TextField()
+    number = models.TextField(unique=True)
     route = models.IntegerField(null=True)
     description = models.TextField()
     location = ListField()
