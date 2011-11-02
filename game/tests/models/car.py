@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User 
 
 from game.models import Car, Stop, UserProfile, FareInfo, Event
-from game.rules import find_fare, get_streetcar_price 
+from game.rules import find_fare, get_streetcar_price, can_buy_car
 
 class CarTests(TestCase):
     def setUp(self):
@@ -38,12 +38,23 @@ class CarTests(TestCase):
                             location=[ -79.402858, 43.644075 ],
                             route=511)
         
+
+    def test_sell_to_not_allowed_raises_exception(self):
+        # This is not ideal, as we're duplicating testing for rules.py
+        self.close.owner = self.user.get_profile()
+        self.close.save()
+        self.assertFalse(can_buy_car(self.user, self.close))
+        with self.assertRaises(Car.CannotBuyCarException):
+            self.close.sell_to(self.user)
+
+        
     def test_sell_to_with_insufficient_funds_raises_exception(self):
         profile = self.user.get_profile()
         profile.balance = 0
         profile.save()
         with self.assertRaises(UserProfile.InsufficientFundsException):
             self.close.sell_to(self.user)
+
 
     def test_sell_to(self):
         profile = self.user.get_profile()
@@ -65,6 +76,8 @@ class CarTests(TestCase):
         self.close.sell_to(self.user)
 
         self.assertEventCreated('car_bought',self.close)
+
+    
     def test_buy_back_credits_account(self):
         profile = self.user.get_profile()
         expected_balance = profile.balance + get_streetcar_price(self.user,

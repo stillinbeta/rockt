@@ -7,7 +7,7 @@ from django.dispatch import receiver
 
 from userprofile import UserProfile
 from event import Event
-from game.rules import find_fare, get_streetcar_price
+from game.rules import find_fare, get_streetcar_price, can_buy_car
 from location import LocationClass
 
 @receiver(pre_save)
@@ -50,6 +50,8 @@ class Car(models.Model,LocationClass):
     objects = CarLocatorManager()
 
     def sell_to(self,user):
+        if not can_buy_car(user, self):
+           raise self.CannotBuyCarException 
         old_user = self.owner
         price = get_streetcar_price(user, self)
         profile = user.get_profile()
@@ -109,3 +111,6 @@ class Car(models.Model,LocationClass):
 
     class Meta:
         app_label = "game"
+
+    class CannotBuyCarException(Exception):
+        pass
