@@ -62,3 +62,20 @@ class SellCarView(AuthRequiredView):
             raise ErrorResponse(403, {'detail': 'You cannot afford this car'})
         else:
             return {'status': 'ok'}
+
+class BuyCarView(AuthRequiredView):
+    def post(self, request):
+        car_number = get_key_or_400(request.POST,'car_number')
+        car = get_model_or_404(Car, number=car_number)
+
+        try:
+           # import pdb; pdb.set_trace()
+            car.buy_back(self.user)
+        except Car.NotAllowedException:
+            raise ErrorResponse(403,
+                {'detail': 'This car doesn not belong to you'})
+        else:
+            return {'status': 'ok'}
+            
+            
+        

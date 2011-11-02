@@ -67,16 +67,17 @@ class Car(models.Model,LocationClass):
         profile.save()
         
     def buy_back(self, user):
-        if not self.owner == user:
+        profile = user.get_profile()
+        if not self.owner == profile:
             raise self.NotAllowedException
         price = get_rule('RULE_GET_STREETCAR_PRICE', self.owner, self) 
         self.owner = None
         self.owner_fares = FareInfo()
         self.save()
         
-        user.balance += price
-        Event.objects.add_car_sold(self, user.user, price)
-        user.save()
+        profile.balance += price
+        Event.objects.add_car_sold(self, user, price)
+        profile.save()
     def ride(self,user,on,off):
         profile = user.get_profile()
         #You don't have to pay for your own streetcars

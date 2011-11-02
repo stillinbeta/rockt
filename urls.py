@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^api/checkin/$', CheckInView.as_view()),
     (r'^api/checkout/$', CheckOutView.as_view()),
     (r'^api/car/sell/$', SellCarView.as_view()),
+    (r'^api/car/buy/$', BuyCarView.as_view()),
     (r'^locations/$','game.views.web.car_locations'),
     (r'^car/(?P<slug>.+)/$',
         DetailView.as_view(

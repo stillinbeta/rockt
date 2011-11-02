@@ -6,10 +6,11 @@ from django.contrib.auth.models import User
 from game.models import Car, Stop, UserProfile
 from game.tests.utils import temporary_settings
 
-class CheckInOutTests(TestCase):
+class Tests(TestCase):
     check_in_url = '/api/checkin/'
     check_out_url = '/api/checkout/'
     car_sell_url = '/api/car/sell/'
+    car_buy_url = '/api/car/buy/'
     
     def setUp(self):
         username='checkinout'
@@ -18,6 +19,8 @@ class CheckInOutTests(TestCase):
                          email='joe@bloggs.com')
         self.user.set_password(password)
         self.user.save()
+        self.user2 = User.objects.create(username='heidi',
+                                         email='heidi@spam.ca')
         self.auth_string = 'Basic ' + b64encode('{}:{}'.format(username,
                                                              'secret'))
         self.car = Car.objects.create(
@@ -34,7 +37,7 @@ class CheckInOutTests(TestCase):
 
 
     def assertStatusCode(self, url, data, code):
-        response= self.client.post(url, data, 
+        response = self.client.post(url, data, 
                                     HTTP_AUTHORIZATION=self.auth_string) 
         self.assertEquals(response.status_code, code)
 
@@ -148,3 +151,33 @@ class CheckInOutTests(TestCase):
                                   200)
         self.car = Car.objects.get(number=self.car.number)
         self.assertEquals(self.car.owner, self.user.get_profile())
+
+
+    def test_car_buy_auth_required(self):
+        self.assertAuthRequired(self.car_buy_url)
+
+
+    def test_car_buy_missing_car_gives_400(self):
+        self.assertStatusCode(self.car_buy_url, {}, 400)
+
+
+    def test_car_buy_invalid_car_gives_404(self):
+        self.assertStatusCode(self.car_buy_url, {'car_number': 0}, 404)
+
+
+    def test_car_buy_not_allowed_returns_403(self):
+        self.car.owner = self.user2.get_profile()
+        self.car.save()
+        self.assertStatusCode(self.car_buy_url,
+                              {'car_number': self.car.number},
+                              403) 
+    def test_car_buy_buys_car(self):
+        self.car.owner = self.user.get_profile()
+        self.car.save()
+        self.assertStatusCode(self.car_buy_url,
+                              {'car_number': self.car.number},
+                              200) 
+        self.car = Car.objects.get(id=self.car.id)
+        self.assertIsNone(self.car.owner)
+    
+
