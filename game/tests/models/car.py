@@ -4,6 +4,7 @@ import json
 from django.test import TestCase
 from django.contrib.auth.models import User 
 
+from game.tests.utils import temporary_settings
 from game.models import Car, Stop, UserProfile, FareInfo, Event
 from game.rules import find_fare, get_streetcar_price, can_buy_car
 
@@ -41,12 +42,11 @@ class CarTests(TestCase):
 
     def test_sell_to_not_allowed_raises_exception(self):
         # This is not ideal, as we're duplicating testing for rules.py
-        self.close.owner = self.user.get_profile()
-        self.close.save()
-        self.assertFalse(can_buy_car(self.user, self.close))
-        with self.assertRaises(Car.CannotBuyCarException):
-            self.close.sell_to(self.user)
-
+        def fake_rule(*args, **kwargs):
+            return False
+        with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule}):
+            with self.assertRaises(Car.CannotBuyCarException):
+                self.close.sell_to(self.user)
         
     def test_sell_to_with_insufficient_funds_raises_exception(self):
         profile = self.user.get_profile()
@@ -57,40 +57,46 @@ class CarTests(TestCase):
 
 
     def test_sell_to(self):
-        profile = self.user.get_profile()
-        new_balance = get_streetcar_price(self.user,self.close) + 50 
-        profile.balance = new_balance
-        profile.save()
-        
-        self.close.owner_fares=FareInfo(riders=10,revenue=15)
-        self.close.sell_to(self.user)
-        self.assertEqual(profile.balance,50)
-        self.assertEqual(self.close.owner_fares.riders,0)
-        self.assertEqual(self.close.owner_fares.revenue,0)
-        self.assertEqual(self.close.owner,profile)
+        price = 65
+        difference = 50
+        def fake_price(*args, **kwargs):
+            return price 
+        with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
+            profile = self.user.get_profile()
+            new_balance = price + difference 
+            profile.balance = new_balance
+            profile.save()
+            
+            self.close.owner_fares=FareInfo(riders=10,revenue=15)
+            self.close.sell_to(self.user)
+            self.assertEqual(profile.balance, difference)
+            self.assertEqual(self.close.owner_fares.riders,0)
+            self.assertEqual(self.close.owner_fares.revenue,0)
+            self.assertEqual(self.close.owner,profile)
     
     def test_sell_to_creates_event(self):
-        profile = self.user.get_profile()
-        profile.balance = 10000000 #hopefully we never get hyperinflation
-        profile.save()
-        self.close.sell_to(self.user)
-
-        self.assertEventCreated('car_bought',self.close)
+        def fake_price(*args, **kwargs):
+            return 0
+        with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
+            self.close.sell_to(self.user)
+            self.assertEventCreated('car_bought',self.close)
 
     
     def test_buy_back_credits_account(self):
+        price = 65
         profile = self.user.get_profile()
-        expected_balance = profile.balance + get_streetcar_price(self.user,
-                                                                 self.close)
-
-        self.close.owner = profile
-        self.close.save()
-        self.close.buy_back()
-        
-        self.assertEqual(profile.balance, expected_balance)
-        self.assertEqual(self.close.owner_fares.riders,0)
-        self.assertEqual(self.close.owner_fares.revenue,0)
-        self.assertEqual(self.close.owner, None) 
+        expected_balance = profile.balance + price
+        def fake_price(*args, **kwargs):
+            return price
+        with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
+            self.close.owner = profile
+            self.close.save()
+            self.close.buy_back()
+            
+            self.assertEqual(profile.balance, expected_balance)
+            self.assertEqual(self.close.owner_fares.riders,0)
+            self.assertEqual(self.close.owner_fares.revenue,0)
+            self.assertEqual(self.close.owner, None) 
 
     def test_buy_back_creates_event(self):
         profile = self.user.get_profile()
@@ -169,23 +175,6 @@ class CarTests(TestCase):
         self.assertEqual(self.close.total_fares.revenue,15 + total_fare)
 
 
-    def test_ride_own_car_doesnt_charge(self):
-        profile = self.user.get_profile()
-        self.close.owner = profile
-        self.close.save()
-
-        old_owner_rev = self.close.owner_fares.revenue
-        old_total_rev = self.close.total_fares.revenue
-        old_balance = profile.balance
-        
-        self.close.ride(self.user,
-                        self.bathurst_station,
-                        self.bathurst_and_king)
-
-        self.assertEqual(self.close.owner_fares.revenue,old_owner_rev)
-        self.assertEqual(self.close.total_fares.revenue,old_total_rev)
-        self.assertEqual(self.user.get_profile().balance,old_balance)
-
     def test_ride_creates_event(self):
         #Ensure no fare issues 
         self.close.owner = self.user.get_profile()
@@ -202,3 +191,5 @@ class CarTests(TestCase):
                                 datetime.timedelta(seconds=1))
         self.assertEquals(event.data['car'], self.close.number) 
         self.assertEquals(event.data['rider'], self.user.username)
+        self.assertFalse(can_buy_car(self.user, self.close))
+        

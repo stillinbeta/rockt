@@ -86,5 +86,8 @@ AUTH_PROFILE_MODULE = 'game.UserProfile'
 NEXTBUS_API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
 NEXTBUS_ROUTE_LIST = [str(num) for num in range(501,513)]
 GTFS_URL = 'http://opendata.toronto.ca/TTC/routes/OpenData_TTC_Schedules.zip'
-
 INITIAL_BALANCE = 1000
+
+RULE_CAN_BUY_CAR = 'game.rules.can_buy_car'
+RULE_FIND_FARE = 'game.rules.find_fare'
+RULE_GET_STREETCAR_PRICE = 'game.rules.get_streetcar_price'

@@ -4,10 +4,12 @@ from djangotoolbox.fields import ListField,EmbeddedModelField
 from django_mongodb_engine.contrib import MongoDBManager
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.conf import settings
+from django.core.urlresolvers import get_callable
 
 from userprofile import UserProfile
 from event import Event
-from game.rules import find_fare, get_streetcar_price, can_buy_car
+from game.rules import get_rule 
 from location import LocationClass
 
 @receiver(pre_save)
@@ -50,10 +52,10 @@ class Car(models.Model,LocationClass):
     objects = CarLocatorManager()
 
     def sell_to(self,user):
-        if not can_buy_car(user, self):
+        if not get_rule('RULE_CAN_BUY_CAR',user, self):
            raise self.CannotBuyCarException 
         old_user = self.owner
-        price = get_streetcar_price(user, self)
+        price = get_rule('RULE_GET_STREETCAR_PRICE', user, self)
         profile = user.get_profile()
         if profile.balance < price:
             raise UserProfile.InsufficientFundsException
@@ -66,7 +68,7 @@ class Car(models.Model,LocationClass):
         profile.save()
         
     def buy_back(self):
-        price = get_streetcar_price(self.owner, self) 
+        price = get_rule('RULE_GET_STREETCAR_PRICE', self.owner, self) 
         owner = self.owner
         self.owner = None
         self.owner_fares = FareInfo()
@@ -79,7 +81,7 @@ class Car(models.Model,LocationClass):
         profile = user.get_profile()
         #You don't have to pay for your own streetcars
         insufficient_funds = False
-        fare_paid  = find_fare(user, self, on, off) 
+        fare_paid  = get_rule('RULE_FIND_FARE', user, self, on, off) 
         if fare_paid > profile.balance:
            fare_paid = 0
            insufficient_funds = True

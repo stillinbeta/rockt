@@ -5,6 +5,7 @@ from django.core import management
 from django.test import TestCase
 
 from game.models import Car
+from game.tests.utils import temporary_settings
 
 XML_FILE = os.path.dirname(__file__) + '/test-updatecars.xml' 
 
@@ -15,9 +16,11 @@ class NullStream:
 
 class UpdateCarsTests(TestCase):
     def setUp(self):
-        settings.NEXTBUS_API_URL = XML_FILE
-        settings.NEXTBUS_ROUTE_LIST = ["501","511"]
-        management.call_command('updatecars',stdout=NullStream())
+        self.temporary_settings = temporary_settings(
+                                {'NEXTBUS_API_URL': XML_FILE, 
+                                 'NEXTBUS_ROUTE_LIST' : ("501", "511")})
+        with self.temporary_settings:
+            management.call_command('updatecars',stdout=NullStream())
 
     def test_only_two_imported(self):
         self.assertEquals(Car.objects.count(),2)
@@ -37,7 +40,8 @@ class UpdateCarsTests(TestCase):
         self.assertItemsEqual(alrv.location, [-79.281281, 43.673717])
     
     def test_old_cars_not_added_twice(self):
-        management.call_command('updatecars',stdout=NullStream())
+        with self.temporary_settings:
+            management.call_command('updatecars',stdout=NullStream())
         self.assertEquals(Car.objects.count(),2)
 
     def test_car_not_in_update_marked_inactive(self):
@@ -46,5 +50,6 @@ class UpdateCarsTests(TestCase):
                            route=511,
                            location=(0,0),
                            active=True,)
-        management.call_command('updatecars',stdout=NullStream())
+        with self.temporary_settings:
+            management.call_command('updatecars',stdout=NullStream())
         self.assertFalse(Car.objects.get(number=number).active)

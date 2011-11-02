@@ -7,6 +7,7 @@ from django.core import management
 from django.test import TestCase
 
 from game.models import Stop
+from game.tests.utils import temporary_settings
 from updatecars import NullStream
 
 THIS_DIR = os.path.dirname(__file__) 
@@ -21,8 +22,8 @@ class UpdateStopsTests(TestCase):
         with ZipFile(THIS_DIR + GTFS_ZIP,'w') as gtfszip:
             for txt in glob.glob(THIS_DIR + GTFS_SUBDIR + '/*.txt'):
                 gtfszip.write(txt,os.path.basename(txt))
-        settings.GTFS_URL = THIS_DIR + GTFS_ZIP
-        management.call_command('updatestops',stdout=NullStream())
+        with temporary_settings({'GTFS_URL': THIS_DIR + GTFS_ZIP}):
+            management.call_command('updatestops',stdout=NullStream())
     
     def test_correct_number_stops_created(self):
         self.assertEquals(Stop.objects.count(),3) 
