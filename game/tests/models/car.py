@@ -45,7 +45,7 @@ class CarTests(TestCase):
         def fake_rule(*args, **kwargs):
             return False
         with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule}):
-            with self.assertRaises(Car.CannotBuyCarException):
+            with self.assertRaises(Car.NotAllowedException):
                 self.close.sell_to(self.user)
         
     def test_sell_to_with_insufficient_funds_raises_exception(self):

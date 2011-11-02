@@ -53,7 +53,7 @@ class Car(models.Model,LocationClass):
 
     def sell_to(self,user):
         if not get_rule('RULE_CAN_BUY_CAR',user, self):
-           raise self.CannotBuyCarException 
+           raise self.NotAllowedException
         old_user = self.owner
         price = get_rule('RULE_GET_STREETCAR_PRICE', user, self)
         profile = user.get_profile()
@@ -114,5 +114,5 @@ class Car(models.Model,LocationClass):
     class Meta:
         app_label = "game"
 
-    class CannotBuyCarException(Exception):
+    class NotAllowedException(Exception):
         pass

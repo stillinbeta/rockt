@@ -55,7 +55,7 @@ class SellCarView(AuthRequiredView):
 
         try:
             car.sell_to(self.user)
-        except Car.CannotBuyCarException:
+        except Car.NotAllowedException:
             raise ErrorResponse(403, 
                 {'detail': 'You are not allowed to purchase this car'})
         except UserProfile.InsufficientFundsException:
