@@ -46,3 +46,19 @@ class StopFindView(View):
             raise ErrorResponse(400, {'detail': 'Invalid Coordinates'})
 
         return Stop.objects.find_nearby(location)
+
+
+class SellCarView(AuthRequiredView):
+    def post(self, request):
+        car_number = get_key_or_400(request.POST,'car_number')
+        car = get_model_or_404(Car, number=car_number)
+
+        try:
+            car.sell_to(self.user)
+        except Car.CannotBuyCarException:
+            raise ErrorResponse(403, 
+                {'detail': 'You are not allowed to purchase this car'})
+        except UserProfile.InsufficientFundsException:
+            raise ErrorResponse(403, {'detail': 'You cannot afford this car'})
+        else:
+            return {'status': 'ok'}

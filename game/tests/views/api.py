@@ -4,10 +4,12 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from game.models import Car, Stop, UserProfile
+from game.tests.utils import temporary_settings
 
 class CheckInOutTests(TestCase):
     check_in_url = '/api/checkin/'
     check_out_url = '/api/checkout/'
+    car_sell_url = '/api/car/sell/'
     
     def setUp(self):
         username='checkinout'
@@ -97,3 +99,52 @@ class CheckInOutTests(TestCase):
         # Because it's important that there only ever be one user by this
         # this username, we delete when we're finished
         self.user.delete()
+
+
+    def test_car_sell_auth_required(self):
+        self.assertAuthRequired(self.car_sell_url)
+
+
+    def test_car_sell_missing_car_gives_400(self):
+        self.assertStatusCode(self.car_sell_url, {}, 400)
+
+
+    def test_car_sell_invalid_car_gives_404(self):
+        self.assertStatusCode(self.car_sell_url, {'car_number': 0}, 404)
+
+
+    def test_car_sell_not_allowed_returns_403(self):
+        def fake_rule(*args, **kwargs):
+            return False
+        with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule}):
+            self.assertStatusCode(self.car_sell_url,
+                                  {'car_number': self.car.number},
+                                  403) 
+    
+    def test_car_sell_insufficient_funds_returns_403(self):
+        profile = self.user.get_profile()
+        profile.balance = 0
+        profile.save()
+        def fake_price(*args, **kwargs):
+            return 100
+        with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
+            self.assertStatusCode(self.car_sell_url,
+                                  {'car_number': self.car.number},
+                                  403)
+            
+         
+    def test_car_sell_transfers_ownership(self):
+        self.car.owner = None
+        self.car.save()
+        
+        def fake_rule(*args, **kwargs):
+            return True 
+        def fake_price(*args, **kwargs):
+            return 0
+        with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule,
+                                 'RULE_GET_STREETCAR_PRICE': fake_price}):
+            self.assertStatusCode(self.car_sell_url,
+                                  {'car_number': self.car.number},
+                                  200)
+        self.car = Car.objects.get(number=self.car.number)
+        self.assertEquals(self.car.owner, self.user.get_profile())
