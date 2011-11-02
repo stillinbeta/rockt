@@ -48,7 +48,6 @@ class Car(models.Model,LocationClass):
     owner_fares = EmbeddedModelField(FareInfo)
     total_fares = EmbeddedModelField(FareInfo)
     
-    
     objects = CarLocatorManager()
 
     def sell_to(self,user):
@@ -67,16 +66,17 @@ class Car(models.Model,LocationClass):
         Event.objects.add_car_bought(self,user, price, self._get_owner_user()) 
         profile.save()
         
-    def buy_back(self):
+    def buy_back(self, user):
+        if not self.owner == user:
+            raise self.NotAllowedException
         price = get_rule('RULE_GET_STREETCAR_PRICE', self.owner, self) 
-        owner = self.owner
         self.owner = None
         self.owner_fares = FareInfo()
         self.save()
         
-        owner.balance += price
-        Event.objects.add_car_sold(self, owner.user, price)
-        owner.save()
+        user.balance += price
+        Event.objects.add_car_sold(self, user.user, price)
+        user.save()
     def ride(self,user,on,off):
         profile = user.get_profile()
         #You don't have to pay for your own streetcars
@@ -102,6 +102,7 @@ class Car(models.Model,LocationClass):
             self.owner.balance += fare_paid
             self.owner.save()
 
+
     def _get_owner_user(self):
         if self.owner:
             return self.owner.user
@@ -111,8 +112,10 @@ class Car(models.Model,LocationClass):
     class MongoMeta:
         indexes = [{'fields': [('location',GEO2D),'route']}]
 
+
     class Meta:
         app_label = "game"
+
 
     class NotAllowedException(Exception):
         pass

@@ -82,6 +82,7 @@ class CarTests(TestCase):
             self.assertEventCreated('car_bought',self.close)
 
     
+     
     def test_buy_back_credits_account(self):
         price = 65
         profile = self.user.get_profile()
@@ -91,7 +92,7 @@ class CarTests(TestCase):
         with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
             self.close.owner = profile
             self.close.save()
-            self.close.buy_back()
+            self.close.buy_back(self.user.get_profile())
             
             self.assertEqual(profile.balance, expected_balance)
             self.assertEqual(self.close.owner_fares.riders,0)
@@ -102,7 +103,7 @@ class CarTests(TestCase):
         profile = self.user.get_profile()
         self.close.owner = profile
         self.close.save()
-        self.close.buy_back()
+        self.close.buy_back(profile)
 
         self.assertEventCreated('car_sold',self.close)
 
