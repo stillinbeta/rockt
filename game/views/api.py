@@ -6,7 +6,7 @@ from djangorestframework.permissions import IsAuthenticated
 from djangorestframework.response import ErrorResponse
 
 from game.util import get_model_or_404, get_key_or_400
-from game.models import Stop, Car, UserProfile
+from game.models import Stop, Car, UserProfile, Event
 
 
 class AuthRequiredView(View, AuthMixin):
@@ -63,6 +63,7 @@ class SellCarView(AuthRequiredView):
         else:
             return {'status': 'ok'}
 
+
 class BuyCarView(AuthRequiredView):
     def post(self, request):
         car_number = get_key_or_400(request.POST,'car_number')
@@ -78,4 +79,11 @@ class BuyCarView(AuthRequiredView):
             return {'status': 'ok'}
             
             
+class CarTimelineView(View):
+    def get(self, request, number):
+        car = get_model_or_404(Car, number=number)
         
+        for event in Event.objects.get_car_timeline(car):
+            yield {'user': event.data.get('user'),
+                   'event': event.event,
+                   'date' : event.date} 

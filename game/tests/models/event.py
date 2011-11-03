@@ -28,7 +28,7 @@ class EventTests(TestCase):
                                 active=True,
                                 location=[ -79.402858, 43.644075 ],)
 
-
+    
     def test_add_car_bought_data_correct(self):
         price = 150
         event = Event.objects.add_car_bought(self.car,self.user,price) 

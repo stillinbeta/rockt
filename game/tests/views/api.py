@@ -1,9 +1,10 @@
 from base64 import b64encode
+import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from game.models import Car, Stop, UserProfile
+from game.models import Car, Stop, UserProfile, Event
 from game.tests.utils import temporary_settings
 
 class Tests(TestCase):
@@ -11,6 +12,7 @@ class Tests(TestCase):
     check_out_url = '/api/checkout/'
     car_sell_url = '/api/car/sell/'
     car_buy_url = '/api/car/buy/'
+    car_timeline_url = '/api/car/timeline/{number}/'
     
     def setUp(self):
         username='checkinout'
@@ -180,4 +182,29 @@ class Tests(TestCase):
         self.car = Car.objects.get(id=self.car.id)
         self.assertIsNone(self.car.owner)
     
+    
+    def test_car_timeline_api_404_on_invalid_car(self):
+        response = self.client.get(self.car_timeline_url.format(number=0))
+        self.assertEquals(response.status_code, 404)
 
+    def test_car_timeline_accurate(self):
+        e1 = Event.objects.add_car_bought(self.car, self.user, 0)
+        e2 = Event.objects.add_car_ride(self.user, 
+                                        None, 
+                                        self.car, 
+                                        self.stop, 
+                                        self.stop,
+                                        0)
+        e3 = Event.objects.add_car_sold(self.car, self.user, 0)
+        
+        url = self.car_timeline_url.format(number=self.car.number)
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+
+        data = json.loads(response.content)
+        
+        self.assertEquals(len(data), 3)
+        expected_events = ('car_sold', 'car_bought', 'car_ride')
+
+        for event in data:
+            self.assertIn(event['event'], expected_events)
