@@ -3,7 +3,7 @@ def get_rule(setting_name, *args, **kwargs):
     from django.core.urlresolvers import get_callable
 
     return get_callable(getattr(settings, setting_name))(*args, **kwargs)
-    """ Get a rule from a settings name, and return its result """    
+    """ Get a rule from a settings name, and return its result """
 
 
 def find_fare(user, car, on, off):
@@ -30,6 +30,3 @@ def get_streetcar_price(user, car):
 
 def can_buy_car(user, car):
     return car.owner is None
-
-
-    

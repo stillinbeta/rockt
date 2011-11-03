@@ -5,9 +5,9 @@ from django.contrib import admin
 from django.views.generic import DetailView, ListView
 from django.views.generic.simple import direct_to_template
 admin.autodiscover()
-from djangorestframework.views import InstanceModelView 
+from djangorestframework.views import InstanceModelView
 
-from rockt.game.models import Car,Stop
+from rockt.game.models import Car, Stop
 from rockt.game.views.web import StopDetailedView
 from rockt.game.resources import StopResource
 from rockt.game.views.api import *
@@ -15,8 +15,8 @@ from rockt.game.views.api import *
 urlpatterns = patterns('',
 
     (r'^admin/', include(admin.site.urls)),
-	(r'^$', direct_to_template, {'template' : 'map.html'}),
-    (r'^api/stop/(?P<number>[^/]+)/$', 
+    (r'^$', direct_to_template, {'template': 'map.html'}),
+    (r'^api/stop/(?P<number>[^/]+)/$',
         InstanceModelView.as_view(resource=StopResource)),
     (r'^api/stop/find/(?P<lat>[^/]+)/(?P<lon>[^/]+)/$',
         StopFindView.as_view()),
@@ -25,20 +25,21 @@ urlpatterns = patterns('',
     (r'^api/car/sell/$', SellCarView.as_view()),
     (r'^api/car/buy/$', BuyCarView.as_view()),
     (r'^api/car/timeline/(?P<number>[^/]+)/$', CarTimelineView.as_view()),
-    (r'^locations/$','game.views.web.car_locations'),
+    (r'^locations/$', 'game.views.web.car_locations'),
     (r'^car/(?P<slug>.+)/$',
         DetailView.as_view(
-            model = Car,
-            slug_field = 'number',
-            template_name = 'car.html',)),
-    (r'^stops/locate/$', direct_to_template, {'template' : 'geolocation.html'}),
+            model=Car,
+            slug_field='number',
+            template_name='car.html',)),
+    (r'^stops/locate/$', direct_to_template,
+        {'template': 'geolocation.html'}),
     (r'^stops/locate/(?P<lat>.+)/(?P<lon>.+)/', 'game.views.web.nearby_stops'),
     (r'^stops/$',
         ListView.as_view(
-            model = Stop,
+            model=Stop,
             context_object_name='stops',
-            template_name = 'stops.html')),
+            template_name='stops.html')),
     (r'^stop/(?P<slug>.+)/$',
         StopDetailedView.as_view(
-            template_name = 'cars_nearby.html')),
+            template_name='cars_nearby.html')),
 )

@@ -1,6 +1,6 @@
-# This file imports from GTFS datasets. The process is rather roundabout 
+# This file imports from GTFS datasets. The process is rather roundabout
 # due to lack of stop data by route. The entire process is very
-# inefficient, but it's destined not to run very often 
+# inefficient, but it's destined not to run very often
 import itertools
 import tempfile
 from urllib import urlopen
@@ -11,6 +11,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from game.models import Stop
+
 
 class Command(BaseCommand):
     help = 'Update the location data for the stops'
@@ -27,44 +28,41 @@ class Command(BaseCommand):
         finally:
             rmtree(tmpdir)
 
-    def retrieve_data(self,tmpdir):
+    def retrieve_data(self, tmpdir):
         gtfs_url = settings.GTFS_URL
         datafilename = tmpdir + '/data.zip'
-        datafile = open(datafilename,'w') 
+        datafile = open(datafilename, 'w')
         request = urlopen(gtfs_url)
         for line in request:
             datafile.write(line)
-        datafile.close() 
+        datafile.close()
 
         archive = ZipFile(datafilename)
         archive.extractall(tmpdir)
         archive.close()
-        
 
-    def update_stops(self,path_to_gtfs):
-        #Start out with the route numbers. In Toronto, this is 501 to 512
+    def update_stops(self, path_to_gtfs):
         route_nums = []
-        for i in range(501,513):
+        for i in settings.NEXTBUS_ROUTE_LIST:
             route_nums.append(str(i))
 
-
-        trip_set= set() #We use a set to avoid duplicates
-        trip_routes = {} #Keep track of which route on which trip
+        trip_set = set()  # We use a set to avoid duplicates
+        trip_routes = {}  # Keep track of which route on which trip
         with open(path_to_gtfs + '/trips.txt') as trips:
             for trip in trips:
                 trip = trip.split(',')
-                if trip[3][0:3] in route_nums: #trip[3] is route_name
-                    trip_set.add(trip[2]) #trip[2] is trip_id
-                    #store which route for which trip
-                    trip_routes[trip[2]] = trip[3][0:3] 
+                if trip[3][0:3] in route_nums:  # trip[3] is route_name
+                    trip_set.add(trip[2])  # trip[2] is trip_id
+                    # store which route for which trip
+                    trip_routes[trip[2]] = trip[3][0:3]
 
         stop_id_set = set()
-        stop_id_routes = {} #Continue to collect route information
+        stop_id_routes = {}  # Continue to collect route information
         with open(path_to_gtfs + '/stop_times.txt') as stop_times:
             for stop_time in stop_times:
                 stop_time = stop_time.split(',')
-                if stop_time[0] in trip_set: #stop_time[0] is trip_id
-                    stop_id_set.add(stop_time[3]) #stop_time[3] is stop_id
+                if stop_time[0] in trip_set:  # stop_time[0] is trip_id
+                    stop_id_set.add(stop_time[3])  # stop_time[3] is stop_id
                     stop_id_routes[stop_time[3]] = trip_routes[stop_time[0]]
 
         stop_set = set()
@@ -83,9 +81,9 @@ class Command(BaseCommand):
             new_stop = Stop()
             new_stop.number = stop[0]
             #Make the description easy to read
-            new_stop.description = stop[1].title() 
+            new_stop.description = stop[1].title()
             #MongoDB indices are lon/lat
-            new_stop.location = (float(stop[3]),float(stop[2])) 
+            new_stop.location = (float(stop[3]), float(stop[2]))
             new_stop.route = int(stop[4])
             new_stop.save()
             count += 1

@@ -16,14 +16,14 @@ class AuthRequiredView(View, AuthMixin):
 
 class CheckInView(AuthRequiredView):
     def post(self, request):
-            stop_number = get_key_or_400(request.POST,'stop_number')
-            car_number = get_key_or_400(request.POST,'car_number')
+            stop_number = get_key_or_400(request.POST, 'stop_number')
+            car_number = get_key_or_400(request.POST, 'car_number')
 
             stop = get_model_or_404(Stop, number=stop_number)
             car = get_model_or_404(Car, number=car_number)
-            
+
             userprofile = self.user.get_profile()
-            userprofile.check_in(car, stop) 
+            userprofile.check_in(car, stop)
             return {'status': 'ok'}
 
 
@@ -50,13 +50,13 @@ class StopFindView(View):
 
 class SellCarView(AuthRequiredView):
     def post(self, request):
-        car_number = get_key_or_400(request.POST,'car_number')
+        car_number = get_key_or_400(request.POST, 'car_number')
         car = get_model_or_404(Car, number=car_number)
 
         try:
             car.sell_to(self.user)
         except Car.NotAllowedException:
-            raise ErrorResponse(403, 
+            raise ErrorResponse(403,
                 {'detail': 'You are not allowed to purchase this car'})
         except UserProfile.InsufficientFundsException:
             raise ErrorResponse(403, {'detail': 'You cannot afford this car'})
@@ -66,7 +66,7 @@ class SellCarView(AuthRequiredView):
 
 class BuyCarView(AuthRequiredView):
     def post(self, request):
-        car_number = get_key_or_400(request.POST,'car_number')
+        car_number = get_key_or_400(request.POST, 'car_number')
         car = get_model_or_404(Car, number=car_number)
 
         try:
@@ -77,13 +77,13 @@ class BuyCarView(AuthRequiredView):
                 {'detail': 'This car doesn not belong to you'})
         else:
             return {'status': 'ok'}
-            
-            
+
+
 class CarTimelineView(View):
     def get(self, request, number):
         car = get_model_or_404(Car, number=number)
-        
+
         for event in Event.objects.get_car_timeline(car):
             yield {'user': event.data.get('user'),
                    'event': event.event,
-                   'date' : event.date} 
+                   'date': event.date}

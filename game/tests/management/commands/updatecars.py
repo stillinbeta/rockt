@@ -7,29 +7,32 @@ from django.test import TestCase
 from game.models import Car
 from game.tests.utils import temporary_settings
 
-XML_FILE = os.path.dirname(__file__) + '/test-updatecars.xml' 
+XML_FILE = os.path.dirname(__file__) + '/test-updatecars.xml'
+
 
 #can't have any output clogging our unit testing
 class NullStream:
     def write(self, string):
         pass
 
+
 class UpdateCarsTests(TestCase):
     def setUp(self):
         self.temporary_settings = temporary_settings(
-                                {'NEXTBUS_API_URL': XML_FILE, 
-                                 'NEXTBUS_ROUTE_LIST' : ("501", "511")})
+                                {'NEXTBUS_API_URL': XML_FILE,
+                                 'NEXTBUS_ROUTE_LIST': ("501", "511")})
         with self.temporary_settings:
-            management.call_command('updatecars',stdout=NullStream())
+            management.call_command('updatecars', stdout=NullStream())
 
     def test_only_two_imported(self):
-        self.assertEquals(Car.objects.count(),2)
-        
+        self.assertEquals(Car.objects.count(), 2)
+
     def test_other_routes_not_imported(self):
         with self.assertRaises(Car.DoesNotExist):
             Car.objects.get(number=1049)
         with self.assertRaises(Car.DoesNotExist):
             Car.objects.get(number=8217)
+
     def test_imported_data_correct(self):
         clrv = Car.objects.get(number=4095)
         self.assertEquals(clrv.route, 501)
@@ -38,18 +41,18 @@ class UpdateCarsTests(TestCase):
         alrv = Car.objects.get(number=4212)
         self.assertEquals(alrv.route, 511)
         self.assertItemsEqual(alrv.location, [-79.281281, 43.673717])
-    
+
     def test_old_cars_not_added_twice(self):
         with self.temporary_settings:
-            management.call_command('updatecars',stdout=NullStream())
-        self.assertEquals(Car.objects.count(),2)
+            management.call_command('updatecars', stdout=NullStream())
+        self.assertEquals(Car.objects.count(), 2)
 
     def test_car_not_in_update_marked_inactive(self):
         number = 4111
         Car.objects.create(number=number,
                            route=511,
-                           location=(0,0),
+                           location=(0, 0),
                            active=True,)
         with self.temporary_settings:
-            management.call_command('updatecars',stdout=NullStream())
+            management.call_command('updatecars', stdout=NullStream())
         self.assertFalse(Car.objects.get(number=number).active)

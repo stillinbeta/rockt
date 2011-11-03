@@ -1,6 +1,6 @@
 # Django settings for sibcom project.
 
-DEBUG = True 
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -10,9 +10,9 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default' : {
-        'ENGINE' : 'django_mongodb_engine',
-        'NAME'  : 'rockt',
+    'default': {
+        'ENGINE': 'django_mongodb_engine',
+        'NAME': 'rockt',
     }
 }
 # Local time zone for this installation. Choices can be found here:
@@ -65,10 +65,11 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'rockt.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates"
+    # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	'/home/sib/Devel/rockt/templates',
+    '/home/sib/Devel/rockt/templates',
 )
 
 INSTALLED_APPS = (
@@ -83,8 +84,9 @@ INSTALLED_APPS = (
 
 AUTH_PROFILE_MODULE = 'game.UserProfile'
 
-NEXTBUS_API_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=ttc&r=%&t=0'
-NEXTBUS_ROUTE_LIST = [str(num) for num in range(501,513)]
+NEXTBUS_API_URL = ('http://webservices.nextbus.com/service/publicXMLFeed?' +
+                   'command=vehicleLocations&a=ttc&r=%&t=0')
+NEXTBUS_ROUTE_LIST = [str(num) for num in range(501, 513)]
 GTFS_URL = 'http://opendata.toronto.ca/TTC/routes/OpenData_TTC_Schedules.zip'
 INITIAL_BALANCE = 1000
 
