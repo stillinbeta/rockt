@@ -38,7 +38,7 @@ class EventManager(MongoDBManager):
 class Event(models.Model):
     event  = models.TextField()
     data = DictField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     objects = EventManager()
 

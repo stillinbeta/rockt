@@ -38,7 +38,7 @@ class CarTests(TestCase):
         self.bathurst_and_king = Stop.objects.create(
                             location=[ -79.402858, 43.644075 ],
                             route=511)
-        
+
 
     def test_sell_to_not_allowed_raises_exception(self):
         # This is not ideal, as we're duplicating testing for rules.py
@@ -47,7 +47,8 @@ class CarTests(TestCase):
         with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule}):
             with self.assertRaises(Car.NotAllowedException):
                 self.close.sell_to(self.user)
-        
+
+
     def test_sell_to_with_insufficient_funds_raises_exception(self):
         profile = self.user.get_profile()
         profile.balance = 0
@@ -74,6 +75,7 @@ class CarTests(TestCase):
             self.assertEqual(self.close.owner_fares.revenue,0)
             self.assertEqual(self.close.owner,profile)
     
+
     def test_sell_to_creates_event(self):
         def fake_price(*args, **kwargs):
             return 0
@@ -116,9 +118,9 @@ class CarTests(TestCase):
 
     def assertEventCreated(self, event_name, car):
         event = Event.objects.filter(event=event_name)[0]
-        self.assertAlmostEquals(datetime.date.today(),
+        self.assertAlmostEquals(datetime.datetime.now(),
                                 event.date,
-                                datetime.timedelta(seconds=1))
+                                delta=datetime.timedelta(seconds=1))
         self.assertEquals(event.data['car'], car.number)
         
 
@@ -193,9 +195,9 @@ class CarTests(TestCase):
 
         event = Event.objects.filter(event='car_ride')[0]
         
-        self.assertAlmostEquals(datetime.date.today(),
+        self.assertAlmostEquals(datetime.datetime.now(),
                                 event.date,
-                                datetime.timedelta(seconds=1))
+                                delta=datetime.timedelta(seconds=1))
         self.assertEquals(event.data['car'], self.close.number) 
         self.assertEquals(event.data['rider'], self.user.username)
         self.assertFalse(can_buy_car(self.user, self.close))
