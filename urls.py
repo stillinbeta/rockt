@@ -8,9 +8,9 @@ admin.autodiscover()
 from djangorestframework.views import InstanceModelView
 
 from rockt.game.models import Car, Stop
-from rockt.game.views.web import StopDetailedView
 from rockt.game.resources import StopResource
-from rockt.game.views.api import *
+from rockt.game.views.api.car import *
+from rockt.game.views.api.stop import StopFindView
 
 urlpatterns = patterns('',
 

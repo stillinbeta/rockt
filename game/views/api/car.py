@@ -37,16 +37,6 @@ class CheckOutView(AuthRequiredView):
             raise ErrorResponse(400, {'detail': 'User is not checked in'})
 
 
-class StopFindView(View):
-    def get(self, request, lat, lon):
-        try:
-            location = (float(lon), float(lat))
-        except ValueError:
-            raise ErrorResponse(400, {'detail': 'Invalid Coordinates'})
-
-        return Stop.objects.find_nearby(location)
-
-
 class CarSellView(AuthRequiredView):
     def post(self, request, number):
         car = get_model_or_404(Car, number=number)
