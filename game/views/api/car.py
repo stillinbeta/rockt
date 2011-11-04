@@ -1,17 +1,10 @@
 from django.contrib.auth.models import User
 from djangorestframework.views import View
-from djangorestframework.mixins import AuthMixin
-from djangorestframework.authentication import BasicAuthentication
-from djangorestframework.permissions import IsAuthenticated
 from djangorestframework.response import ErrorResponse
 
 from game.util import get_model_or_404, get_key_or_400
 from game.models import Stop, Car, UserProfile, Event
-
-
-class AuthRequiredView(View, AuthMixin):
-    authentication = (BasicAuthentication,)
-    permissions = (IsAuthenticated,)
+from game.views.api.common import AuthRequiredView
 
 
 class CarCheckInView(AuthRequiredView):

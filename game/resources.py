@@ -1,4 +1,5 @@
 from djangorestframework.resources import ModelResource
+from django.contrib.auth.models import User
 
 from game.models import Stop, Car
 
@@ -11,3 +12,11 @@ class StopResource(ModelResource):
     def cars_nearby(self, instance):
         for car in Car.objects.find_nearby(instance)[:10]:
             yield {'number': car.number, 'location': car.location}
+
+
+class UserResource(ModelResource):
+    model = User
+    fields = ('username', 'balance',)
+
+    def balance(self, instance):
+        return instance.get_profile().balance

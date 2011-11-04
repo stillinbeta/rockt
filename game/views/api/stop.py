@@ -1,7 +1,8 @@
-from djangorestframework.views import View 
+from djangorestframework.views import View
 from djangorestframework.response import ErrorResponse
 
 from game.models import Stop
+
 
 class StopFindView(View):
     def get(self, request, lat, lon):

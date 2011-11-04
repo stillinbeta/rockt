@@ -44,7 +44,7 @@ class Car(models.Model, LocationClass):
     #Location information fields
     number = models.PositiveIntegerField(db_index=True)
     route = models.IntegerField(null=True)
-    active = models.BooleanField()
+    active = models.BooleanField(default=False)
     location = ListField()
 
     #Financial information fields
