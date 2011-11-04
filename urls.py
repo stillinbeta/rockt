@@ -7,11 +7,11 @@ from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
 from rockt.game.models import Car, Stop
-from rockt.game.resources import StopResource, UserResource 
+from rockt.game.resources import StopResource, UserResource
 from rockt.game.views.api.car import *
 from rockt.game.views.api.common import ReadOnlyModelView
 from rockt.game.views.api.stop import StopFindView
-from rockt.game.views.api.user import UserCarListView
+from rockt.game.views.api.user import UserCarListView, UserCarView
 
 urlpatterns = patterns('',
 
@@ -42,5 +42,8 @@ urlpatterns = patterns('',
         name='user'),
     url(r'^api/user/car/$',
         UserCarListView.as_view(),
+        name='user-car-list'),
+    url('^api/user/car/(?P<number>[^/]+)/$',
+        UserCarView.as_view(),
         name='user-car'),
 )

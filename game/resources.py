@@ -20,3 +20,18 @@ class UserResource(ModelResource):
 
     def balance(self, instance):
         return instance.get_profile().balance
+
+
+class UserCarResource(ModelResource):
+    model = Car
+    fields = ('route', 'active', 'number', 'owner_fares', 'total_fares',
+              'location')
+    #exclude = ('owner', 'owner_fares', 'total_fares')
+
+    def owner_fares(self, instance):
+        return {'revenue': instance.owner_fares.revenue,
+                'riders': instance.owner_fares.riders}
+
+    def total_fares(self, instance):
+        return {'revenue': instance.total_fares.revenue,
+                'riders': instance.total_fares.riders}
