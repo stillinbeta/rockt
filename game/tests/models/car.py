@@ -3,6 +3,7 @@ import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from game.tests.utils import temporary_settings
 from game.models import Car, Stop, UserProfile, FareInfo, Event
@@ -127,7 +128,7 @@ class CarTests(TestCase):
                                           self.close])
 
     def test_find_nearby_api(self):
-        api_url = '/api/stop/{}/'.format(self.bathurst_station.number)
+        api_url = reverse('stop', args=(self.bathurst_station.number,))
 
         response = self.client.get(api_url)
         self.assertEquals(response.status_code, 200)

@@ -14,13 +14,12 @@ class AuthRequiredView(View, AuthMixin):
     permissions = (IsAuthenticated,)
 
 
-class CheckInView(AuthRequiredView):
-    def post(self, request):
-            stop_number = get_key_or_400(request.POST, 'stop_number')
-            car_number = get_key_or_400(request.POST, 'car_number')
+class CarCheckInView(AuthRequiredView):
+    def post(self, request, number):
+            car = get_model_or_404(Car, number=number)
 
+            stop_number = get_key_or_400(request.POST, 'stop_number')
             stop = get_model_or_404(Stop, number=stop_number)
-            car = get_model_or_404(Car, number=car_number)
 
             userprofile = self.user.get_profile()
             userprofile.check_in(car, stop)
@@ -48,10 +47,9 @@ class StopFindView(View):
         return Stop.objects.find_nearby(location)
 
 
-class SellCarView(AuthRequiredView):
-    def post(self, request):
-        car_number = get_key_or_400(request.POST, 'car_number')
-        car = get_model_or_404(Car, number=car_number)
+class CarSellView(AuthRequiredView):
+    def post(self, request, number):
+        car = get_model_or_404(Car, number=number)
 
         try:
             car.sell_to(self.user)
@@ -64,10 +62,9 @@ class SellCarView(AuthRequiredView):
             return {'status': 'ok'}
 
 
-class BuyCarView(AuthRequiredView):
-    def post(self, request):
-        car_number = get_key_or_400(request.POST, 'car_number')
-        car = get_model_or_404(Car, number=car_number)
+class CarBuyView(AuthRequiredView):
+    def post(self, request, number):
+        car = get_model_or_404(Car, number=number)
 
         try:
            # import pdb; pdb.set_trace()

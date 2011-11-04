@@ -1,19 +1,21 @@
 from base64 import b64encode
 import json
 
+
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from game.models import Car, Stop, UserProfile, Event
 from game.tests.utils import temporary_settings
 
 
-class Tests(TestCase):
-    check_in_url = '/api/checkin/'
-    check_out_url = '/api/checkout/'
-    car_sell_url = '/api/car/sell/'
-    car_buy_url = '/api/car/buy/'
-    car_timeline_url = '/api/car/timeline/{number}/'
+class CarApiTests(TestCase):
+    checkout_name = 'car-checkout'
+    checkin_name = 'car-checkin'
+    sell_name = 'car-sell'
+    buy_name = 'car-buy'
+    timeline_name = 'car-timeline'
 
     def setUp(self):
         username = 'checkinout'
@@ -39,33 +41,36 @@ class Tests(TestCase):
         response = self.client.post(url)
         self.assertEquals(response.status_code, 403)
 
-    def assertStatusCode(self, url, data, code):
+    def assertStatusCode(self, name, args=(), stop_number=None, code=200):
+        # Stop number needs to be paramaterized
+        if stop_number is not None:
+            data = {'stop_number': stop_number}
+        else:
+            data = {}
+
+        # We usually pass args as a single paramater. Tuplize it.
+        if not args == ():
+            args = (args,)
+
+        url = reverse(name, args=args)
         response = self.client.post(url, data,
                                     HTTP_AUTHORIZATION=self.auth_string)
         self.assertEquals(response.status_code, code)
 
     def test_check_in_requires_auth(self):
-        self.assertAuthRequired(self.check_in_url)
-
-    def test_check_in_missing_parameters_gives_400(self):
-        self.assertStatusCode(self.check_in_url, {'stop_number': 1}, 400)
-        self.assertStatusCode(self.check_in_url, {'car_number': 1}, 400)
+        self.assertAuthRequired(reverse(self.checkin_name, args=('0')))
 
     def test_check_in_invalid_info_gives_404(self):
-        self.assertStatusCode(self.check_in_url,
-                              {'stop_number': self.stop.number,
-                               'car_number': 0},
-                              404)
-        self.assertStatusCode(self.check_in_url,
-                              {'stop_number': 0,
-                               'car_number': self.car.number},
-                              404)
+        self.assertStatusCode(self.checkin_name, self.car.number, 0, 404)
+        self.assertStatusCode(self.checkin_name, 0, self.stop.number, 404)
+
+    def test_check_in_missing_parameters_gives_400(self):
+        self.assertStatusCode(self.checkin_name, self.car.number, code=400)
 
     def test_check_in_creates_riding(self):
-        self.assertStatusCode(self.check_in_url,
-                              {'stop_number': self.stop.number,
-                               'car_number': self.car.number},
-                              200)
+        self.assertStatusCode(self.checkin_name,
+                              self.car.number,
+                              self.stop.number)
 
         profile = self.user.get_profile()
         self.assertIsNotNone(profile.riding)
@@ -73,56 +78,45 @@ class Tests(TestCase):
         self.assertEquals(profile.riding.boarded, self.stop)
 
     def test_check_out_requires_auth(self):
-        self.assertAuthRequired(self.check_out_url)
+        self.assertAuthRequired(reverse(self.checkout_name))
 
     def test_check_out_missing_stop_gives_400(self):
-        self.assertStatusCode(self.check_out_url, {}, 400)
+        self.assertStatusCode(self.checkout_name, code=400)
 
     def test_check_out_invalid_stop_gives_404(self):
-        self.assertStatusCode(self.check_out_url, {'stop_number': 0}, 404)
+        self.assertStatusCode(self.checkout_name,
+                              stop_number=0,
+                              code=404)
 
     def test_check_out_not_riding_gives_400(self):
         profile = self.user.get_profile()
         profile.riding = None
         profile.save()
 
-        self.assertStatusCode(self.check_out_url,
-                              {'stop_number': self.stop.number},
-                              400)
+        self.assertStatusCode(self.checkout_name,
+                              stop_number=self.stop.number,
+                              code=400)
 
     def test_check_out_finishes_ride(self):
-        self.assertStatusCode(self.check_in_url,
-                              {'stop_number': self.stop.number,
-                               'car_number': self.car.number},
-                              200)
-        self.assertStatusCode(self.check_out_url,
-                              {'stop_number': self.stop.number},
-                              200)
+        self.assertStatusCode(self.checkin_name,
+                              self.car.number,
+                              self.stop.number)
+        self.assertStatusCode(self.checkout_name, stop_number=self.stop.number)
         self.assertIsNone(self.user.get_profile().riding)
 
-    def tearDown(self):
-        # Because it's important that there only ever be one user by this
-        # this username, we delete when we're finished
-        self.user.delete()
-
-    def test_car_sell_auth_required(self):
-        self.assertAuthRequired(self.car_sell_url)
-
-    def test_car_sell_missing_car_gives_400(self):
-        self.assertStatusCode(self.car_sell_url, {}, 400)
+    def test_sell_auth_required(self):
+        self.assertAuthRequired(reverse(self.sell_name, args=('0')))
 
     def test_car_sell_invalid_car_gives_404(self):
-        self.assertStatusCode(self.car_sell_url, {'car_number': 0}, 404)
+        self.assertStatusCode(self.sell_name, 0, code=404)
 
-    def test_car_sell_not_allowed_returns_403(self):
+    def test_sell_not_allowed_returns_403(self):
         def fake_rule(*args, **kwargs):
             return False
         with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule}):
-            self.assertStatusCode(self.car_sell_url,
-                                  {'car_number': self.car.number},
-                                  403)
+            self.assertStatusCode(self.sell_name, self.car.number, code=403)
 
-    def test_car_sell_insufficient_funds_returns_403(self):
+    def test_sell_insufficient_funds_returns_403(self):
         profile = self.user.get_profile()
         profile.balance = 0
         profile.save()
@@ -130,11 +124,9 @@ class Tests(TestCase):
         def fake_price(*args, **kwargs):
             return 100
         with temporary_settings({'RULE_GET_STREETCAR_PRICE': fake_price}):
-            self.assertStatusCode(self.car_sell_url,
-                                  {'car_number': self.car.number},
-                                  403)
+            self.assertStatusCode(self.sell_name, self.car.number, code=403)
 
-    def test_car_sell_transfers_ownership(self):
+    def test_sell_transfers_ownership(self):
         self.car.owner = None
         self.car.save()
 
@@ -145,42 +137,33 @@ class Tests(TestCase):
             return 0
         with temporary_settings({'RULE_CAN_BUY_CAR': fake_rule,
                                  'RULE_GET_STREETCAR_PRICE': fake_price}):
-            self.assertStatusCode(self.car_sell_url,
-                                  {'car_number': self.car.number},
-                                  200)
+            self.assertStatusCode(self.sell_name, self.car.number)
         self.car = Car.objects.get(number=self.car.number)
         self.assertEquals(self.car.owner, self.user.get_profile())
 
-    def test_car_buy_auth_required(self):
-        self.assertAuthRequired(self.car_buy_url)
-
-    def test_car_buy_missing_car_gives_400(self):
-        self.assertStatusCode(self.car_buy_url, {}, 400)
+    def test_buy_auth_required(self):
+        self.assertAuthRequired(reverse(self.buy_name, args=('0')))
 
     def test_car_buy_invalid_car_gives_404(self):
-        self.assertStatusCode(self.car_buy_url, {'car_number': 0}, 404)
+        self.assertStatusCode(self.buy_name, 0, code=404)
 
-    def test_car_buy_not_allowed_returns_403(self):
+    def test_buy_not_allowed_returns_403(self):
         self.car.owner = self.user2.get_profile()
         self.car.save()
-        self.assertStatusCode(self.car_buy_url,
-                              {'car_number': self.car.number},
-                              403)
+        self.assertStatusCode(self.buy_name, self.car.number, code=403)
 
-    def test_car_buy_buys_car(self):
+    def test_buy_buys_car(self):
         self.car.owner = self.user.get_profile()
         self.car.save()
-        self.assertStatusCode(self.car_buy_url,
-                              {'car_number': self.car.number},
-                              200)
+        self.assertStatusCode(self.buy_name, self.car.number)
         self.car = Car.objects.get(id=self.car.id)
         self.assertIsNone(self.car.owner)
 
-    def test_car_timeline_api_404_on_invalid_car(self):
-        response = self.client.get(self.car_timeline_url.format(number=0))
+    def test_timeline_api_404_on_invalid_car(self):
+        response = self.client.get(reverse(self.timeline_name, args=(0,)))
         self.assertEquals(response.status_code, 404)
 
-    def test_car_timeline_accurate(self):
+    def test_timeline_accurate(self):
         e1 = Event.objects.add_car_bought(self.car, self.user, 0)
         e2 = Event.objects.add_car_ride(self.user,
                                         None,
@@ -190,8 +173,8 @@ class Tests(TestCase):
                                         0)
         e3 = Event.objects.add_car_sold(self.car, self.user, 0)
 
-        url = self.car_timeline_url.format(number=self.car.number)
-        response = self.client.get(url)
+        response = self.client.get(reverse(self.timeline_name,
+                                           args=(self.car.number,)))
         self.assertEquals(response.status_code, 200)
 
         data = json.loads(response.content)
@@ -201,3 +184,8 @@ class Tests(TestCase):
 
         for event in data:
             self.assertIn(event['event'], expected_events)
+
+    def tearDown(self):
+        # Because it's important that there only ever be one user by this
+        # this username, we delete when we're finished
+        self.user.delete()

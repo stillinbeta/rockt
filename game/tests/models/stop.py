@@ -1,6 +1,8 @@
 import json
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
+
 from game.models import Stop
 
 
@@ -25,13 +27,14 @@ class StopTest(TestCase):
                                  self.expected)
 
     def test_find_nearby_api_returns_400_invalid_lat_lon(self):
-        api_urls = ['/api/stop/find/' + tail for tail in ('00/aa/', 'aa/00/')]
+        api_urls = [reverse('stop-find', args=args) for args in (('00', 'aa'),
+                                                                 ('aa', '00'))]
         for api_url in api_urls:
             self.assertEquals(self.client.get(api_url).status_code, 400)
 
     def test_find_nearby_api(self):
         #Grumble grumble lat,lon for everyone but Mongo
-        api_url = '/api/stop/find/{}/{}/'.format(self.loc[1], self.loc[0])
+        api_url = reverse('stop-find', args=(self.loc[1], self.loc[0]))
 
         response = self.client.get(api_url)
         self.assertEquals(response.status_code, 200)
