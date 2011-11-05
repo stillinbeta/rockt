@@ -16,9 +16,12 @@ class UserCarListApiTests(ApiTests):
     def setUp(self):
         super(UserCarListApiTests, self).setUp()
 
-        self.car1 = Car.objects.create(number='4001', location=(0, 0))
-        self.car2 = Car.objects.create(number='4002', location=(0, 0))
-        self.car3 = Car.objects.create(number='4003', location=(0, 0))
+        self.car1 = Car.objects.create(number='4001',
+                                       location=(-79.4110, 43.66449))
+        self.car2 = Car.objects.create(number='4002',
+                                       location=(-79.4065, 43.66449))
+        self.car3 = Car.objects.create(number='4003',
+                                       location=(-79.3995, 43.63651))
 
     def test_auth_required(self):
         response = self.client.get(reverse(self.api_name))
@@ -31,17 +34,21 @@ class UserCarListApiTests(ApiTests):
             self.car1.sell_to(self.user)
             self.car3.sell_to(self.user)
 
-        expected_responses = [car.number for car in (self.car1,
-                                                            self.car3)]
+        expected_cars = {car.number: car for car in (self.car1,
+                                                     self.car3)}
         response = self._make_get()
         self.assertEquals(response.status_code, 200)
 
         data = json.loads(response.content)
         self.assertEquals(len(data), 2)
         for car in data:
-            number = str(car['car'])
-            self.assertIn(number, expected_responses)
-            expected_responses.remove(number)
+            self.assertIn(str(car['number']), expected_cars)
+            expected = expected_cars[str(car['number'])]
+            self.assertSequenceEqual(car['location'], expected.location)
+            self.assertEquals(car['timeline_url'],
+                              reverse('car-timeline', args=(car['number'],)))
+            self.assertEquals(car['stats_url'],
+                              reverse('user-car', args=(car['number'],)))
 
 
 class UserCarApiTests(ApiTests):

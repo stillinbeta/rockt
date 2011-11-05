@@ -1,5 +1,6 @@
 from djangorestframework.response import ErrorResponse
 from djangorestframework.mixins import InstanceMixin
+from django.core.urlresolvers import reverse
 
 from game.util import get_model_or_404
 from game.views.api.common import AuthRequiredView, ReadOnlyModelView
@@ -9,7 +10,10 @@ from game.resources import UserResource, UserCarResource
 class UserCarListView(AuthRequiredView):
     def get(self, request):
         for car in self.user.get_profile().car_set.all():
-            yield {'car': car.number, 'location': car.location}
+            yield {'number': car.number,
+                   'location': car.location,
+                   'timeline_url': reverse('car-timeline', args=(car.number,)),
+                   'stats_url': reverse('user-car', args=(car.number,))}
 
 
 class UserCarView(AuthRequiredView, InstanceMixin):
