@@ -11,7 +11,7 @@ from rockt.game.resources import StopResource, UserResource
 from rockt.game.views.api.car import *
 from rockt.game.views.api.common import ReadOnlyModelView
 from rockt.game.views.api.stop import StopFindView
-from rockt.game.views.api.user import UserCarListView, UserCarView
+from rockt.game.views.api.user import UserCarListView, UserCarView, UserView
 
 urlpatterns = patterns('',
 
@@ -38,7 +38,7 @@ urlpatterns = patterns('',
         StopFindView.as_view(),
         name='stop-find'),
     url(r'^api/user/$',
-        ReadOnlyModelView.as_view(resource=UserResource),
+        UserView.as_view(),
         name='user'),
     url(r'^api/user/car/$',
         UserCarListView.as_view(),

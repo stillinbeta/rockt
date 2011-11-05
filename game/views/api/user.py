@@ -1,10 +1,17 @@
 from djangorestframework.response import ErrorResponse
-from djangorestframework.mixins import InstanceMixin
+from djangorestframework.mixins import InstanceMixin, ReadModelMixin
 from django.core.urlresolvers import reverse
 
 from game.util import get_model_or_404
 from game.views.api.common import AuthRequiredView, ReadOnlyModelView
 from game.resources import UserResource, UserCarResource
+
+
+class UserView(AuthRequiredView, InstanceMixin):
+    resource = UserResource
+
+    def get(self, request):
+        return self.user
 
 
 class UserCarListView(AuthRequiredView):

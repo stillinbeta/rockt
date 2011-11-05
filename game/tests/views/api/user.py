@@ -5,9 +5,58 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from game.models import Car
+from game.models import Car, Stop
 from game.tests.utils import temporary_settings
 from game.tests.views.api.common import ApiTests
+
+
+class UserApiTest(ApiTests):
+    api_name = 'user'
+
+    def setUp(self):
+        super(UserApiTest, self).setUp()
+
+        self.car = Car.objects.create(number='4100', location=(0, 0))
+        self.stop = Stop.objects.create(number='0',
+                                        description='?',
+                                        location=(0, 0))
+
+    def test_auth_required(self):
+        response = self.client.get(reverse(self.api_name))
+        self.assertEquals(response.status_code, 403)
+
+    def test_user_data_accurate(self):
+        profile = self.user.get_profile()
+        profile.balance = 100
+        profile.save()
+
+        response = self._make_get()
+        self.assertEquals(response.status_code, 200)
+
+        data = json.loads(response.content)
+        self.assertEquals(data['username'], self.user.username)
+        self.assertEquals(data['balance'], profile.balance)
+
+    def test_not_checked_in_checkout_url_none(self):
+        profile = self.user.get_profile()
+        profile.riding = None
+        profile.save()
+
+        response = self._make_get()
+        self.assertEquals(response.status_code, 200)
+        data = json.loads(response.content)
+
+        self.assertIsNone(data['check_out_url'])
+
+    def test_checked_in_checkout_url_accurate(self):
+        self.user.get_profile().check_in(self.car, self.stop)
+
+        response = self._make_get()
+        self.assertEquals(response.status_code, 200)
+        data = json.loads(response.content)
+
+        self.assertEquals(data['check_out_url'],
+                          reverse('car-checkout'))
 
 
 class UserCarListApiTests(ApiTests):
@@ -83,16 +132,19 @@ class UserCarApiTests(ApiTests):
 
         response = self._make_get((self.car.number,))
         self.assertStatusCode(response, 200)
-
         data = json.loads(response.content)
-        for key, value in data.items():
-            field = getattr(self.car, key, None)
-            self.assertIsNotNone(field)
-            if type(value) == dict:
-                for sub_key, sub_value in value.items():
-                    self.assertEquals(sub_value,
-                        getattr(field, sub_key))
-            elif type(field) == str:
-                self.assertEquals(str(value), field)
-            else:
-                self.assertEquals(value, field)
+
+        expected_fields = 'route', 'active', 'number', 'location'
+        for field in expected_fields:
+            self.assertIn(field, data)
+            self.assertEquals(str(data[field]), str(getattr(self.car, field)))
+
+        expected_fares = 'owner_fares', 'total_fares'
+        for fare in expected_fares:
+            self.assertIn(fare, data)
+            expected_fare = getattr(self.car, fare)
+            self.assertEquals(data[fare]['revenue'], expected_fare.revenue)
+            self.assertEquals(data[fare]['riders'], expected_fare.riders)
+
+        self.assertEquals(data['sell_car_url'],
+                          reverse('car-sell', args=(self.car.number,)))
