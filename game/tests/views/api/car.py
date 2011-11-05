@@ -104,6 +104,62 @@ class CarApiTests(TestCase):
         self.assertStatusCode(self.checkout_name, stop_number=self.stop.number)
         self.assertIsNone(self.user.get_profile().riding)
 
+    def _get_checkout_data(self):
+        url = reverse(self.checkout_name)
+        response = self.client.post(url,
+                                    data={'stop_number': self.stop.number},
+                                    HTTP_AUTHORIZATION=self.auth_string)
+        self.assertEquals(response.status_code, 200)
+        return json.loads(response.content)
+
+    def test_checkout_returns_fare(self):
+        fare = 100
+        profile = self.user.get_profile()
+        profile.balance = fare * 100
+        profile.save()
+        profile.check_in(self.car, self.stop)
+
+        def fake_fare(*args, **kwargs):
+            return fare
+        with temporary_settings({'RULE_FIND_FARE': fake_fare}):
+            data = self._get_checkout_data()
+        self.assertIn('fare', data)
+        self.assertEquals(data['fare'], fare)
+
+    def test_checkout_cant_buy_has_no_purchase(self):
+        self.user.get_profile().check_in(self.car, self.stop)
+
+        def fake_fare(*args, **kwargs):
+            return 0
+
+        def fake_can_purchase(*args, **kwargs):
+            return False
+        with temporary_settings({'RULE_FIND_FARE': fake_fare,
+                                 'RULE_CAN_BUY_CAR': fake_can_purchase}):
+            data = self._get_checkout_data()
+        self.assertNotIn('purchase', data)
+
+    def test_checkout_can_buy_has_purchase(self):
+        self.user.get_profile().check_in(self.car, self.stop)
+        price = 1000
+
+        def fake_fare(*args, **kwargs):
+            return 0
+
+        def fake_can_purchase(*args, **kwargs):
+            return True
+
+        def fake_price(*args, **kwargs):
+            return price
+        with temporary_settings({'RULE_FIND_FARE': fake_fare,
+                                 'RULE_CAN_BUY_CAR': fake_can_purchase,
+                                 'RULE_GET_STREETCAR_PRICE': fake_price}):
+            data = self._get_checkout_data()
+        self.assertIn('purchase', data)
+        self.assertEquals(data['purchase']['price'], price)
+        self.assertEquals(data['purchase']['url'],
+                          reverse('car-buy', args=(self.car.number,)))
+
     def test_sell_auth_required(self):
         self.assertAuthRequired(reverse(self.sell_name, args=('0')))
 

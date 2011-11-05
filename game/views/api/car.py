@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from djangorestframework.views import View
 from djangorestframework.response import ErrorResponse
 
 from game.util import get_model_or_404, get_key_or_400
 from game.models import Stop, Car, UserProfile, Event
 from game.views.api.common import AuthRequiredView
+from game.rules import get_rule
 
 
 class CarCheckInView(AuthRequiredView):
@@ -24,8 +26,18 @@ class CheckOutView(AuthRequiredView):
         stop_number = get_key_or_400(request.POST, 'stop_number')
         stop = get_model_or_404(Stop, number=stop_number)
         try:
-            self.user.get_profile().check_out(stop)
-            return {'status': 'ok'}
+            profile = self.user.get_profile()
+            if profile.riding:
+                car = profile.riding.car
+            fare = self.user.get_profile().check_out(stop)
+            dic = {'fare': fare}
+            if get_rule('RULE_CAN_BUY_CAR', self.user, car):
+                dic['purchase'] = {
+                    'price': get_rule('RULE_GET_STREETCAR_PRICE',
+                                      self.user,
+                                      car),
+                    'url': reverse('car-buy', args=(car.number,))}
+            return dic
         except UserProfile.NotCheckedInException:
             raise ErrorResponse(400, {'detail': 'User is not checked in'})
 

@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from game.models import Car, UserProfile, Stop
+from game.tests.utils import temporary_settings
 
 
 class UserProfileTests(TestCase):
@@ -46,3 +47,17 @@ class UserProfileTests(TestCase):
         profile.check_in(self.car, self.bathurst_station)
         with self.assertRaises(UserProfile.InsufficientFundsException):
             profile.check_out(self.bathurst_and_king)
+
+    def test_checkout_returns_fare(self):
+        fare = 100
+        profile = self.user.get_profile()
+        profile.balance = fare * 10
+        profile.save()
+
+        def fake_fare(*args, **kwargs):
+            return fare
+
+        profile.check_in(self.car, self.bathurst_station)
+        with temporary_settings({'RULE_FIND_FARE': fake_fare}):
+            self.assertEquals(profile.check_out(self.bathurst_and_king),
+                              fare)

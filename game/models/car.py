@@ -108,6 +108,8 @@ class Car(models.Model, LocationClass):
             self.owner.balance += fare_paid
             self.owner.save()
 
+        return fare_paid
+
     def _get_owner_user(self):
         if self.owner:
             return self.owner.user

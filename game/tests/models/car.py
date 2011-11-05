@@ -154,32 +154,39 @@ class CarTests(TestCase):
                             self.bathurst_and_king)
 
     def test_ride(self):
+        fare = 50
+        offset = 10
         profile = self.user.get_profile()
-        profile.balance = 10 * 100
+        profile.balance = fare + offset
         owner_profile = self.user2.get_profile()
         self.close.owner_fares = FareInfo()
         self.close.owner = owner_profile
-        self.close.total_fares = FareInfo(riders=1, revenue=15)
 
-        total_fare = find_fare(self.user,
-                               self.close,
-                               self.bathurst_station,
-                               self.bathurst_and_king,)
+        original_riders = 1
+        original_revenue = 15
+        self.close.total_fares = FareInfo(riders=original_riders,
+                                          revenue=original_revenue)
 
-        expected_rider_balance = profile.balance - total_fare
-        expected_owner_balance = owner_profile.balance + total_fare
-        self.close.ride(self.user,
-                        self.bathurst_station,
-                        self.bathurst_and_king)
+        def fake_fare(*args, **kwargs):
+            return fare
+
+        expected_rider_balance = profile.balance - fare
+        expected_owner_balance = owner_profile.balance + fare
+        with temporary_settings({'RULE_FIND_FARE': fake_fare}):
+            self.assertEquals(self.close.ride(self.user,
+                                   self.bathurst_station,
+                                   self.bathurst_and_king),
+                               fare)
 
         self.assertEqual(self.user.get_profile().balance,
             expected_rider_balance)
         self.assertEqual(self.user2.get_profile().balance,
             expected_owner_balance)
         self.assertEqual(self.close.owner_fares.riders, 1)
-        self.assertEqual(self.close.owner_fares.revenue, total_fare)
-        self.assertEqual(self.close.total_fares.riders, 2)
-        self.assertEqual(self.close.total_fares.revenue, 15 + total_fare)
+        self.assertEqual(self.close.owner_fares.revenue, fare)
+        self.assertEqual(self.close.total_fares.riders, original_riders + 1)
+        self.assertEqual(self.close.total_fares.revenue,
+                        original_revenue + fare)
 
     def test_ride_creates_event(self):
         #Ensure no fare issues

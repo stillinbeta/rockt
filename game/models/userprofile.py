@@ -34,9 +34,11 @@ class UserProfile(models.Model):
         if self.riding == None:
             raise self.NotCheckedInException
 
-        self.riding.car.ride(self.user, self.riding.boarded, stop)
+        fare = self.riding.car.ride(self.user, self.riding.boarded, stop)
         self.riding = None
         self.save()
+
+        return fare
 
     #Thrown when you try to check out and not checked in
     class NotCheckedInException(Exception):
