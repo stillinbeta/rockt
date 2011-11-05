@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from game.models import Stop
+from game.tests.utils import temporary_settings
 
 
 class StopTest(TestCase):
@@ -41,6 +42,19 @@ class StopTest(TestCase):
 
         data = json.loads(response.content)
         self.assertEquals(len(data), len(self.expected))
+        expected_fields = (u'number', u'route', u'description', 'location')
         for i in range(len(data)):
-            for key, val in data[i].items():
-                self.assertEquals(val, getattr(self.expected[i], key))
+            for key in expected_fields:
+                self.assertIn(key, data[i])
+                self.assertEquals(data[i][key], getattr(self.expected[i], key))
+
+    def test_find_nearby_limits_by_setting(self):
+        api_url = reverse('stop-find', args=(self.loc[1], self.loc[0]))
+
+        limit = 2
+        with temporary_settings({'STOP_SEARCH_LIMIT': limit}):
+            response = self.client.get(api_url)
+        self.assertEquals(response.status_code, 200)
+        data = json.loads(response.content)
+
+        self.assertEquals(len(data), limit)
