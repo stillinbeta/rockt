@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'rockt.game',
+    'rockt.registration',
     'djangorestframework',
 )
 
