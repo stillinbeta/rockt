@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 
 from game.models import Car, Event
 from game.rules import get_rule
+from game.forms import ProfileForm
 
 
 @login_required
@@ -71,3 +72,17 @@ def sell(request, number):
     dic = {'number': car.number,
            'price': get_rule('RULE_GET_STREETCAR_PRICE', request.user, car)}
     return TemplateResponse(request, 'sell.html', dic)
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        profile_form = ProfileForm(request.user, request.POST)
+        if profile_form.is_valid():
+            profile_form.save()
+            return TemplateResponse(request, 'message.html',
+                                    {'message': 'Ding!'})
+    else:
+        profile_form = ProfileForm(request.user)
+    dic = {'profile_form': profile_form}
+    return TemplateResponse(request, 'profile.html', dic)

@@ -20,6 +20,7 @@ a:hover {
     text-align: center;
     background: #5B0000; 
     border-radius: 4px;
+    color: white;
 }
 
 .button:hover {
@@ -220,3 +221,39 @@ a:hover {
         float: right; 
     }
 
+#profile {
+    font-size: 16pt;
+}
+    #profile p {
+        overflow: hidden;
+    }
+
+    #profile label {
+        width: 200px;
+        text-align: right;
+        display: block;
+        float: left;
+    }
+    
+    #profile input {
+        margin-left: 10px;
+        border: 2px solid black;
+        border-radius: 4px;
+        font-size: 16pt;
+        width: 300px;
+    }
+
+    #profile input[type="submit"] {
+        margin-left: 210px;
+    } 
+
+    #profile ul.errorlist {
+        margin-left: 210px;
+        padding: 0;
+        list-style: none;
+        width: 300px;
+    }
+
+
+
+    
