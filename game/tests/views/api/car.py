@@ -236,10 +236,12 @@ class CarApiTests(TestCase):
         data = json.loads(response.content)
 
         self.assertEquals(len(data), 3)
-        expected_events = ('car_sold', 'car_bought', 'car_ride')
+        expected_events = ['car_sold', 'car_bought', 'car_ride']
 
         for event in data:
             self.assertIn(event['event'], expected_events)
+            expected_events.remove(event['event'])
+            self.assertEquals(event['user'], self.user.username)
 
     def tearDown(self):
         # Because it's important that there only ever be one user by this

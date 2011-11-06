@@ -76,6 +76,15 @@ class CarTimelineView(View):
         car = get_model_or_404(Car, number=number)
 
         for event in Event.objects.get_car_timeline(car):
-            yield {'user': event.data.get('user'),
+            if event.event == 'car_ride':
+                user_id = event.data.get('rider')
+            else:
+                user_id = event.data.get('user')
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                continue
+            yield {'user': user.username,
                    'event': event.event,
                    'date': event.date}

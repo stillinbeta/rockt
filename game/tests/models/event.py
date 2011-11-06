@@ -34,7 +34,7 @@ class EventTests(TestCase):
         event = Event.objects.add_car_bought(self.car, self.user, price)
         self.assertEquals(event.event, 'car_bought')
         self.assertEquals(event.data['car'], self.car.number)
-        self.assertEquals(event.data['user'], self.user.username)
+        self.assertEquals(event.data['user'], self.user.id)
         self.assertEquals(event.data['price'], price)
 
     def test_add_car_old_user_only_added_if_present(self):
@@ -46,14 +46,14 @@ class EventTests(TestCase):
                                              self.user,
                                              price,
                                              self.user2)
-        self.assertEquals(event.data['old_user'], self.user2.username)
+        self.assertEquals(event.data['old_user'], self.user2.id)
 
     def test_add_car_sold_data_correct(self):
         price = 150
         event = Event.objects.add_car_sold(self.car, self.user, price)
         self.assertEquals(event.event, 'car_sold')
         self.assertEquals(event.data['car'], self.car.number)
-        self.assertEquals(event.data['user'], self.user.username)
+        self.assertEquals(event.data['user'], self.user.id)
         self.assertEquals(event.data['price'], price)
 
     def test_add_car_ride_data_accurate(self):
@@ -67,11 +67,11 @@ class EventTests(TestCase):
                                   'location': stop.location}
         expected = {
             'car': self.car.number,
-            'rider': self.user.username,
+            'rider': self.user.id,
             'on': make_dict(self.bathurst_and_king),
             'off': make_dict(self.bathurst_station),
             'fare': fare,
-            'owner': self.user2.username}
+            'owner': self.user2.id}
 
         for key, val in expected.items():
             self.assertEquals(event.data[key], val)

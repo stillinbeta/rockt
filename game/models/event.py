@@ -8,16 +8,16 @@ class EventManager(MongoDBManager):
         event = 'car_bought'
 
         data = {'car': car.number,
-                'user': user.username,
+                'user': user.id,
                 'price': price}
         if old_user:
-            data['old_user'] = old_user.username
+            data['old_user'] = old_user.id
         return self.create(event=event, data=data)
 
     def add_car_sold(self, car, user, price):
         event = 'car_sold'
         data = {'car': car.number,
-                'user': user.username,
+                'user': user.id,
                 'price': price}
         return self.create(event=event, data=data)
 
@@ -26,7 +26,7 @@ class EventManager(MongoDBManager):
         traveled = on.distance_to(off)
         event = 'car_ride'
         data = {'car': car.number,
-                'rider': rider.username,
+                'rider': rider.id,
                 'on': {'number': on.number,
                       'location': on.location},
                 'off': {'number': off.number,
@@ -34,7 +34,7 @@ class EventManager(MongoDBManager):
                 'traveled': traveled,
                 'fare': fare}
         if owner:
-            data['owner'] = owner.username
+            data['owner'] = owner.id
         return self.create(event=event, data=data)
 
     def get_car_timeline(self, car):

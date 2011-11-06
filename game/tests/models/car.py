@@ -203,5 +203,5 @@ class CarTests(TestCase):
                                 event.date,
                                 delta=datetime.timedelta(seconds=1))
         self.assertEquals(event.data['car'], self.close.number)
-        self.assertEquals(event.data['rider'], self.user.username)
+        self.assertEquals(event.data['rider'], self.user.id)
         self.assertFalse(can_buy_car(self.user, self.close))
