@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %} Fleet Map {% endblock %}
+{% block head %} 
+    <script type="text/javascript"
+    src="http://maps.googleapis.com/maps/api/js?sensor=false">
+    </script>
+    <script type="text/javascript">
+        var cars = {{ cars|safe }};
+        function initialize() {
+            var latlng = new google.maps.LatLng(43.6547, -79.3739);
+            var myOptions = { 
+                zoom: 12,
+                center: latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById('map'),
+                myOptions);
+            cars.map( function (car) {
+                var location = new google.maps.LatLng(car.location[1], 
+                    car.location[0]);
+                var marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+                var infowindow = new google.maps.InfoWindow({
+                    content: "Car " + car.number + " on route " + car.route,
+                  //  size: new google.maps.Size(50,50)
+                }); 
+                google.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
+                });
+           });
+                
+            
+        }
+    </script>
+    <style type="text/css">
+        #map {
+            width: 700px;
+            margin: 0 auto;
+            height: 600px;
+        }
+    </style>
+{% endblock %}
+{% block body %} onload="initialize()" {% endblock %}
+{% block content %}
+    <div id="map"></div>
+{% endblock %}

@@ -16,6 +16,10 @@ from rockt.game.views.api.user import UserCarListView, UserCarView, UserView
 urlpatterns = patterns('',
 
     (r'^admin/', include(admin.site.urls)),
+    url(r'^login/', 'django.contrib.auth.views.login', name='login'),
+    url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),
+    url(r'^map/$', 'game.views.web.fleet_map', name='map'),
+    url(r'^fleet/$', 'game.views.web.fleet', name='fleet'),
     url(r'^api/car/checkout/$',
         CheckOutView.as_view(),
         name='car-checkout'),
@@ -46,4 +50,6 @@ urlpatterns = patterns('',
     url('^api/user/car/(?P<number>[^/]+)/$',
         UserCarView.as_view(),
         name='user-car'),
+    ('^static/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/home/sib/Devel/rockt/static'})
 )

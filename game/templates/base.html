@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+            <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+            <title>{% block title %}Rockt{% endblock %}</title>
+            <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}style.css" />
+            <link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+            {% block head %}{% endblock %}
+    </head> 
+    <body{% block body %}{% endblock %}>
+        <div id="centre">
+            <div id="userbox">
+                <div class="userbox-float">
+                {% if username %}
+                Hello, {{ username }}! |
+                ${{ balance }} |
+                <a href="{% url logout %}">Logout</a>
+                {% else %}
+                <a href="{% url login %}">Login</a>
+                {% endif %}
+                </div>
+            </div>
+            <div id="menu">
+                <ul>
+                    {% if username %}
+                    <li {% if selected == 'map'%}class="selected"{% endif %}>
+                        <a href="{% url map %}">Map</a></li>
+                    <li{% if selected == 'fleet'%}class="selected"{% endif %}>
+                        <a href="{% url fleet %}">Fleet</a></li>
+                    <li {% if selected == 'profile'%}class="selected"{% endif %}>
+                        <a href="#">Profile</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div id="content">
+            {% block content %}
+                <div class="map" style="width: 700px; height: 1000px; background-color: white" ></div>
+            {% endblock %}
+            </div>
+            <div id="footer">
+                <a href="http://stillinbeta.com">The Author</a> | 
+                <a href="http://github.com/stillinbeta/rockt">Rockt on GitHub</a>
+            </div>
+        </div>
+    </body>
+</html>
+

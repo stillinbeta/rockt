@@ -39,7 +39,7 @@ MEDIA_ROOT = '/home/sib/rockt/static/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://static.stillinbeta.com/rockt'
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -60,6 +60,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'rockt.game.middleware.UsernameBalanceMiddleware',
 )
 
 ROOT_URLCONF = 'rockt.urls'
@@ -74,7 +75,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django.contrib.admin',
-   # 'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
    # 'django.contrib.sessions',
    # 'django.contrib.sites',
@@ -83,6 +84,8 @@ INSTALLED_APPS = (
 )
 
 AUTH_PROFILE_MODULE = 'game.UserProfile'
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/map'
 
 NEXTBUS_API_URL = ('http://webservices.nextbus.com/service/publicXMLFeed?' +
                    'command=vehicleLocations&a=ttc&r=%&t=0')
