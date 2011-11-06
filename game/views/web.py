@@ -86,5 +86,5 @@ def profile(request):
             redirect(profile)
     else:
         profile_form = ProfileForm(request.user)
-    dic = {'profile_form': profile_form}
+    dic = {'form': profile_form}
     return TemplateResponse(request, 'profile.html', dic)

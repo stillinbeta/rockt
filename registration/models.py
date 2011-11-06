@@ -35,3 +35,8 @@ class BetaKey(models.Model):
         if not self.remaining == -1:
             self.remaining -= 1
         self.save()
+
+
+class WaitingList(models.Model):
+    email = models.EmailField(unique=True)
+    sent = models.BooleanField(default=False)

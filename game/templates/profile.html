@@ -1,11 +1,3 @@
-{% extends 'base.html' %}
+{% extends 'form.html' %}
 {% block title %}Profile{% endblock %}
-{% block content %}
-<div id="profile">
-    <form action="{% url profile %}" method="POST">
-        {% csrf_token %}
-        {{ profile_form.as_p}}
-        <input type="submit" value="Submit" class="button"/>
-    </form>
-</div>
-{% endblock %}
+{% block url %}{% url profile %}{% endblock %}

@@ -112,15 +112,6 @@ a:hover {
         color: red;
     }
 
-#map {
-    margin: 0 auto 0 auto;
-}
-
-#map a {
-    color: black;
-    font-family: san-serif;
-}
-
 #footer {
     text-align: center;
     padding: 10px 0 10px 0;
@@ -131,10 +122,21 @@ a:hover {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
-
     #footer a, #footer a:visited {
         font-family: sans-serif;
     }
+
+
+#map {
+    margin: 0 auto 0 auto;
+}
+
+    #map a {
+        color: black;
+        font-family: san-serif;
+    }
+
+/* Fleet */
 
 #car-list ul {
     width: 75%;
@@ -161,6 +163,8 @@ a:hover {
     #car-list ul li a .revenue {
         float: right;
     }
+
+/* Fleet Car */
 
 #car-data{
     padding: 0 25px 0 45px; 
@@ -239,21 +243,23 @@ a:hover {
         float: right; 
     }
 
-#profile {
+/* Profile */
+
+#form {
     font-size: 16pt;
 }
-    #profile p {
+    #form p {
         overflow: hidden;
     }
 
-    #profile label {
+    #form label {
         width: 200px;
         text-align: right;
         display: block;
         float: left;
     }
     
-    #profile input {
+    #form input {
         margin-left: 10px;
         border: 2px solid black;
         border-radius: 4px;
@@ -261,17 +267,60 @@ a:hover {
         width: 300px;
     }
 
-    #profile input[type="submit"] {
+    #form input[type="submit"] {
         margin-left: 210px;
     } 
 
-    #profile ul.errorlist {
+    #form ul.errorlist {
         margin-left: 210px;
         padding: 0;
         list-style: none;
         width: 300px;
     }
 
+    #form span.helptext {
+        display: block;
+        font-size: 12pt;
+        width: 250px;
+        float: right;
+    }
+
+#waiting-list {
+    width: 600px;
+    margin: 0 auto;
+}
+
+    #waiting-list p.description {
+        font-size: 18pt;
+    }
+
+    #waiting-list input {
+        border: 3px solid black;
+        border-radius: 3px;
+        height: 50px;
+        padding: 0;
+        margin: 0;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+    }
 
 
-    
+    #waiting-list .field-wrapper {
+        float: left;
+    }
+        #waiting-list .field-wrapper input {
+            width: 450px;
+            font-size: 20pt;
+        }
+
+    #waiting-list input.button {
+        width: 125px;
+        float: right;
+    }
+
+    #waiting-list ul {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+    }
