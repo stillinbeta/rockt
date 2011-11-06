@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title%}Car {{ car.number }}{% endblock %}
+{% block head %}
+    <script type="text/javascript"
+    src="http://maps.googleapis.com/maps/api/js?sensor=false">
+    </script>
+    <script type="text/javascript">
+        function initialize() {
+            var pos = {{ car.location }};
+            var latlng = new google.maps.LatLng(pos[1], pos[0]);
+
+            var myOptions = {
+                zoom: 13,
+                center: latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById('car-data-map'),
+                myOptions);
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map
+            });
+        }
+    </script>
+{% endblock %}
+{% block body %} onload="initialize()" {% endblock %}
+
+
+{% block content %}
+    <div id="car-data">
+        <div id="car-data-top">
+            <div id="car-data-stats">
+            <h1>{{ car.number }}</h1>
+            <ul>
+                <li>Route {{ car.route }}</li>
+                <li {% if car.active %} class="status-active">Active
+                    {% else %} class="status-inactive">Inactive
+                    {% endif %}</li>
+             </ul>
+             <a class="sell button" href="{% url sell car.number %}">Sell</a>
+            </div>
+            <div id="car-data-map" style="width: 300px; height: 200px; background-color: grey">
+            </div>
+        </div>
+        <table id="fare-table">
+            <tr>
+                <th></th>
+                <th>Under You</th>
+                <th>Lifetime</th></tr>
+            <tr>
+                <th>Revenue</th>
+                <td>${{ car.owner_fares.revenue }}</td>
+                <td>${{ car.total_fares.revenue }}</td>
+            </tr>
+            <tr>
+                <th>Ridership</th>
+                <td>{{ car.owner_fares.riders}} Riders</td>
+                <td>{{ car.total_fares.riders}} Riders</td>
+            </tr>
+         </table>
+         {% if timeline %}
+         <div id="timeline">
+             <h2>Timeline</h2>
+             <ul>
+                {% for event in timeline %}
+                    <li>
+                        {% if event.event == 'car_bought' %}
+                            Sold to {{ event.data.user }} on 
+                        {{ event.date|date:"DATE_FORMAT" }}
+                        {% endif %}
+                        {% if event.event == 'car_sold' %}
+                            Sold by {{ event.data.user }} on 
+                        {{ event.date|date:"DATE_FORMAT" }}
+                        {% endif %}
+                        {% if event.event == 'car_ride' %}
+                            Ridden By {{ event.data.rider}} on 
+                        {{ event.date|date:"DATE_FORMAT" }}
+                        {% endif %}
+                    </li>
+                 {% endfor %}
+             </ul>
+         </div>
+         {% endif %}
+   </div>
+{% endblock %}

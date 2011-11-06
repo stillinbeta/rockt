@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Fleet{% endblock %}
+
+{% block content %}
+    <div id="car-list">
+    <ul>
+    {% for car in cars %}
+        <li><a href="{% url car car.number %}">
+            <span class="number">Car {{ car.number }}</span>
+            <span class="revenue">$ {{ car.revenue }}</span>
+        </a></li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endblock %}

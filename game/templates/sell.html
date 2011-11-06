@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Selling {{ number }}{% endblock %}
+{% block content %}
+    <div id="sell-car"> 
+        <h1> Sell {{ number }}? </h1>
+        <h2> This car is worth ${{ price }} </h2>
+
+        <div id="button-container">
+        <a class="button" href="{% url car number%}">Cancel</a>
+        <form method="POST" action="{% url sell number %}">
+            <input type="submit" class = "button" name="confirm" value="Sell">
+        </form>
+        </div>
+    </div>
+{% endblock %}

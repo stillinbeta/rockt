@@ -24,8 +24,9 @@
                     map: map
                 });
                 var infowindow = new google.maps.InfoWindow({
-                    content: "Car " + car.number + " on route " + car.route,
-                  //  size: new google.maps.Size(50,50)
+                    content: "<a href='" + car.url + "'>Car " 
+                    + car.number + " on route " + car.route + '</a>',
+                    size: new google.maps.Size(10,50)
                 }); 
                 google.maps.event.addListener(marker, 'click', function() {
                     infowindow.open(map, marker);
@@ -37,10 +38,12 @@
     </script>
     <style type="text/css">
         #map {
+            color: ;
             width: 700px;
             margin: 0 auto;
             height: 600px;
         }
+        
     </style>
 {% endblock %}
 {% block body %} onload="initialize()" {% endblock %}

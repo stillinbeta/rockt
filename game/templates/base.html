@@ -25,7 +25,7 @@
                     {% if username %}
                     <li {% if selected == 'map'%}class="selected"{% endif %}>
                         <a href="{% url map %}">Map</a></li>
-                    <li{% if selected == 'fleet'%}class="selected"{% endif %}>
+                    <li {% if selected == 'fleet'%}class="selected"{% endif %}>
                         <a href="{% url fleet %}">Fleet</a></li>
                     <li {% if selected == 'profile'%}class="selected"{% endif %}>
                         <a href="#">Profile</a></li>
@@ -38,7 +38,7 @@
             {% endblock %}
             </div>
             <div id="footer">
-                <a href="http://stillinbeta.com">The Author</a> | 
+                <a href="http://stillinbeta.com">By stillinbeta</a> | 
                 <a href="http://github.com/stillinbeta/rockt">Rockt on GitHub</a>
             </div>
         </div>
