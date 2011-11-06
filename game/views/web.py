@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.contrib import messages
 
 from game.models import Car, Event
 from game.rules import get_rule
@@ -41,8 +42,8 @@ def car(request, number):
     except Car.DoesNotExist:
         raise Http404
     if not car.owner == request.user.get_profile():
-        return TemplateResponse(request, 'message.html',
-            {'message': 'Not allowed'}, status=403)
+        messages.error(request, 'Not allowed')
+        return redirect('map')
     events = Event.objects.get_car_timeline(car)
     dic = {'car': car, 'timeline': events}
     return TemplateResponse(request, 'car.html', dic)
@@ -55,8 +56,8 @@ def sell(request, number):
     except Car.DoesNotExist:
         raise Http404
     if not car.owner == request.user.get_profile():
-        return TemplateResponse(request, 'message.html',
-            {'message': 'Not allowed'}, status=403)
+        messages.error(request, 'Not allowed')
+        return redirect('map')
     if request.method == 'POST':
         try:
             confirm = request.POST['confirm']
@@ -65,9 +66,10 @@ def sell(request, number):
             #Continue to rendering the page as usual
             pass
         except Car.NotAllowedException:
-            return TemplateResponse(request, 'message.html',
-                {'message': 'Not allowed'}, status=403)
+            messages.error(request, 'Not allowed')
+            return redirect('map')
         else:
+            messages.success(request, 'Sold!')
             return redirect(fleet)
     dic = {'number': car.number,
            'price': get_rule('RULE_GET_STREETCAR_PRICE', request.user, car)}
@@ -80,8 +82,8 @@ def profile(request):
         profile_form = ProfileForm(request.user, request.POST)
         if profile_form.is_valid():
             profile_form.save()
-            return TemplateResponse(request, 'message.html',
-                                    {'message': 'Ding!'})
+            messages.success(request, "Profile Updated")
+            redirect(profile)
     else:
         profile_form = ProfileForm(request.user)
     dic = {'profile_form': profile_form}

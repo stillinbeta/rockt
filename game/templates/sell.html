@@ -8,6 +8,7 @@
         <div id="button-container">
         <a class="button" href="{% url car number%}">Cancel</a>
         <form method="POST" action="{% url sell number %}">
+            {% csrf_token %}
             <input type="submit" class = "button" name="confirm" value="Sell">
         </form>
         </div>
