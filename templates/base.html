@@ -12,7 +12,7 @@
             <div id="userbox">
                 <div class="userbox-float">
                 {% if username %}
-                Hello, {{ username }}! |
+                Hello, <a href="{% url profile %}">{{ username }}</a>! |
                 ${{ balance }} |
                 <a href="{% url logout %}">Logout</a>
                 {% else %}
@@ -22,14 +22,14 @@
             </div>
             <div id="menu">
                 <ul>
-                    {% if username %}
-                    <li {% if selected == 'map'%}class="selected"{% endif %}>
-                        <a href="{% url map %}">Map</a></li>
-                    <li {% if selected == 'fleet'%}class="selected"{% endif %}>
-                        <a href="{% url fleet %}">Fleet</a></li>
-                    <li {% if selected == 'profile'%}class="selected"{% endif %}>
-                        <a href="{% url profile %}">Profile</a></li>
-                    {% endif %}
+                    {% block menu%}
+                    <li {% if selected == 'home'%}class="selected"{% endif %}>
+                        <a href="#">Home</a></li>
+                    <li {% if selected == 'blog'%}class="selected"{% endif %}>
+                        <a href="{% url blog%}">Blog</a></li>
+                    <li {% if selected == 'register'%}class="selected"{% endif %}>
+                        <a href="{% url waiting-list%}">Register</a></li>
+                    {% endblock %}
                 </ul>
             </div>
             <div id="content">

@@ -1,3 +1,4 @@
-{% extends 'form.html' %}
+{% extends 'base.html' %}
 {% block url %}{% url register key %}{% endblock %}
 {% block title %}Registration{% endblock %}
+{% block content %}{% include 'form.html' %}{% endblock %}
