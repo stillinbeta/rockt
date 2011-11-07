@@ -4,22 +4,16 @@ from django.contrib import admin
 admin.autodiscover()
 
 
-
-from rockt.game.models import Car, Stop
-from rockt.game.resources import StopResource, UserResource
-from rockt.game.views.api.car import *
-from rockt.game.views.api.common import ReadOnlyModelView
-from rockt.game.views.api.stop import StopFindView
-from rockt.game.views.api.user import UserCarListView, UserCarView, UserView
-
 urlpatterns = patterns('',
-
     url(r'^$', TemplateView.as_view(template_name='home.html'), name='home'),
     (r'^admin/', include(admin.site.urls)),
     (r'^registration/', include('registration.urls')),
     (r'^blog/', include('blog.urls')),
+    (r'^api/', include('game.api_urls')),
     url(r'^login/', 'django.contrib.auth.views.login', name='login'),
-    url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),
+    url(r'^logout/', 'django.contrib.auth.views.logout',
+        {'next_page': '/'},
+         name='logout'),
     url(r'^map/$', 'game.views.web.fleet_map', name='map'),
     url(r'^fleet/$', 'game.views.web.fleet', name='fleet'),
     url(r'^fleet/(?P<number>[^/]+)/$', 'game.views.web.car', name='car'),
@@ -27,36 +21,6 @@ urlpatterns = patterns('',
         'game.views.web.sell',
         name='sell'),
     url(r'^profile/$', 'game.views.web.profile', name='profile'),
-    url(r'^api/car/checkout/$',
-        CheckOutView.as_view(),
-        name='car-checkout'),
-    url(r'^api/car/(?P<number>[^/]+)/checkin/$',
-        CarCheckInView.as_view(),
-        name='car-checkin'),
-    url(r'^api/car/(?P<number>[^/]+)/sell/$',
-        CarSellView.as_view(),
-        name='car-sell'),
-    url(r'^api/car/(?P<number>[^/]+)/buy/$',
-        CarBuyView.as_view(),
-        name='car-buy'),
-    url(r'^api/car/(?P<number>[^/]+)/timeline/$',
-        CarTimelineView.as_view(),
-        name='car-timeline'),
-    url(r'^api/stop/(?P<number>[^/]+)/$',
-        ReadOnlyModelView.as_view(resource=StopResource),
-        name='stop'),
-    url(r'^api/stop/find/(?P<lat>[^/]+)/(?P<lon>[^/]+)/$',
-        StopFindView.as_view(),
-        name='stop-find'),
-    url(r'^api/user/$',
-        UserView.as_view(),
-        name='user'),
-    url(r'^api/user/car/$',
-        UserCarListView.as_view(),
-        name='user-car-list'),
-    url('^api/user/car/(?P<number>[^/]+)/$',
-        UserCarView.as_view(),
-        name='user-car'),
-    ('^static/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': '/home/sib/Devel/rockt/static'})
+        ('^static/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/home/sib/Devel/rockt/static'})
 )
