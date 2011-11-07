@@ -17,6 +17,7 @@ urlpatterns = patterns('',
 
     (r'^admin/', include(admin.site.urls)),
     (r'^registration/', include('registration.urls')),
+    (r'^blog/', include('blog.urls')),
     url(r'^login/', 'django.contrib.auth.views.login', name='login'),
     url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),
     url(r'^map/$', 'game.views.web.fleet_map', name='map'),

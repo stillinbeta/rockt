@@ -324,3 +324,16 @@ a:hover {
         padding: 0;
         list-style: none;
     }
+
+#blog .post {
+    border-bottom: 2px solid white;
+}
+
+    #blog .post .title , #blog .post .date{
+        padding: 0;
+        margin: 0;
+    }
+
+    #blog .post .date {
+        font-size: 11pt;
+    }

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load markup %}
+{% block title %}Blog{% endblock %}
+{% block content %}
+<div id="blog">
+    {% for post in object_list %}
+        <div class="post">
+            <h2 class="title">{{ post.title }}</h2>
+            <h3 class="date">{{ post.date|date:"DATETIME_FORMAT" }}</h3>
+            <div class="body">{{ post.post|markdown }}</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

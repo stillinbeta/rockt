@@ -81,9 +81,11 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'djangorestframework',
+    'django.contrib.markup',
     'rockt.game',
     'rockt.registration',
-    'djangorestframework',
+    'rockt.blog',
 )
 
 AUTH_PROFILE_MODULE = 'game.UserProfile'
