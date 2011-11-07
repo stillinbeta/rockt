@@ -1,6 +1,6 @@
 # Django settings for sibcom project.
 
-DEBUG = True
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -34,12 +34,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/sib/rockt/static/'
+MEDIA_ROOT = '/home/sib/django/rockt.ca/rockt/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/static/'
+MEDIA_URL = 'http://static.stillinbeta.com/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -47,7 +47,7 @@ MEDIA_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/django-media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '+=4vi8v4jdu#@^$&i_t-u&(%m9#7s4h*th3flja00#wd0!2sq%'
+SECRET_KEY = '@V>=JnE;$*3:8\YxDAEJG%.9\(k68]ekuQh!*BBX4Zfn@fey$W'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -72,7 +72,7 @@ TEMPLATE_DIRS = (
     # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/sib/Devel/rockt/templates',
+    '/home/sib/django/rockt.ca/rockt/templates',
 )
 
 INSTALLED_APPS = (
