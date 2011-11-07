@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="home">
+    <p>Rockt is a geopresence game that takes place on Toronto's
+       streetcar network. Every time you ride a streetcar, you 
+       can check-in, and check out every time you leave. As you 
+       ride, you will be able to purchase your cars, and levy 
+       fees on others. Amass a fleet and control Toronto! Can 
+       you run your network better than the TTC can?
+    </p>
+    <p>Rockt is currently in private beta. To 
+    request an invitation, please register.</p>
+    <a class="button" href="{% url waiting-list %}">Sign Up</a>
+</div>
+{% endblock %}
+     

@@ -126,6 +126,23 @@ a:hover {
         font-family: sans-serif;
     }
 
+/* Home */
+#home {
+    width: 700px;
+    margin: 0 auto;
+}
+
+    #home p {
+        font-size: 18pt;
+    }
+
+    #home a.button {
+        width: 400px; 
+        padding: 30px;
+        margin: 20px auto 0;
+    }
+
+/* map */
 
 #map {
     margin: 0 auto 0 auto;
@@ -135,6 +152,7 @@ a:hover {
         color: black;
         font-family: san-serif;
     }
+
 
 /* Fleet */
 

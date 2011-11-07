@@ -14,6 +14,7 @@ def waiting_list(request):
             form.save()
             messages.success(request,
                 "I'll contact you as soon as space is available")
+            return redirect('home')
     else:
         form = WaitingListForm()
 

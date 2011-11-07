@@ -1,10 +1,9 @@
 from django.conf.urls.defaults import *
+from django.views.generic import TemplateView
 from django.contrib import admin
-
-#Django View Helpers
-from django.views.generic import DetailView, ListView
-from django.views.generic.simple import direct_to_template
 admin.autodiscover()
+
+
 
 from rockt.game.models import Car, Stop
 from rockt.game.resources import StopResource, UserResource
@@ -15,6 +14,7 @@ from rockt.game.views.api.user import UserCarListView, UserCarView, UserView
 
 urlpatterns = patterns('',
 
+    url(r'^$', TemplateView.as_view(template_name='home.html'), name='home'),
     (r'^admin/', include(admin.site.urls)),
     (r'^registration/', include('registration.urls')),
     (r'^blog/', include('blog.urls')),

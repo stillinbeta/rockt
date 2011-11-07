@@ -24,7 +24,7 @@
                 <ul>
                     {% block menu%}
                     <li {% if selected == 'home'%}class="selected"{% endif %}>
-                        <a href="#">Home</a></li>
+                        <a href="{% url home %}">Home</a></li>
                     <li {% if selected == 'blog'%}class="selected"{% endif %}>
                         <a href="{% url blog%}">Blog</a></li>
                     <li {% if selected == 'register'%}class="selected"{% endif %}>
@@ -41,7 +41,6 @@
                 </ul>
             {% endif %}
             {% block content %}
-                <div class="map" style="width: 700px; height: 1000px; background-color: white" ></div>
             {% endblock %}
             </div>
             <div id="footer">
