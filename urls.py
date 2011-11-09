@@ -21,6 +21,8 @@ urlpatterns = patterns('',
         'game.views.web.sell',
         name='sell'),
     url(r'^profile/$', 'game.views.web.profile', name='profile'),
-        ('^static/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': '/home/sib/Devel/rockt/static'})
+       ('^static/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/home/sib/Devel/rockt/static'}),
+       ('^m/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': '/home/sib/Devel/rockt/app'}),
 )
