@@ -15,7 +15,8 @@
     <div id="home" data-role="page" data-theme="a">
         <div data-role="header"><h1>Rockt</h1></div>
         <div data-role="content">
-            <a href="javascript:loadStops()" data-role="button">Check In</a>
+            <a href="javascript:loadStopList()" data-role="button">Check In</a>
+            <a href="javascript:loadStop('http://192.168.1.42:8000/api/stop/07355/')" data-role="button">Fleet Map</a>
             <a href="javascript:error('oops')" data-role="button">Fleet</a>
         </div>
         <div data-role="footer" data-position="fixed">
@@ -38,8 +39,33 @@
         </div>
     </div>
     <div id="map" data-role="page" data-theme="a">
-        <div data-role="header"><h1 class="map-name"></h1></div>
-        <div data-role="content" id="map-content" style="background-color: pink"></div>
+        <div data-role="header"><h1 id="map-name"></h1></div>
+        <div data-role="content" id="map-content"></div>
     </div>
+    <div id="stop" data-role="page" data-theme="a">
+        <div data-role="header"><h1 id="stop-description">Choose a car</h1></div>
+        <div data-role="content">
+            <ul data-role="listview" data-inset="true" data-theme="a" id="car-list">
+                <li data-role="list-divider" id="stop-name">Check In</li>
+            </ul>
+        </div>
+    </div>
+    <div id="confirm" data-role="page" data-theme="a">
+        <div data-role="header"><h1 id="confirm-title"></h1></div>
+        <div data-role="content">
+            <h2 id="message"></h2>
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><a href="#" 
+                   data-role="button"
+                   data-icon="check"
+                   id="confirm-confirm"></a></div>
+                <div class="ui-block-b"><a href="#" 
+                   data-role="button" 
+                   data-rel="back"
+                   data-icon="delete">Cancel</a></div>
+            </div>
+        </div>
+    </div>
+            
 </body>	
 </html>
