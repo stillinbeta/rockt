@@ -4,12 +4,15 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from game.models import Car, Stop
+from game.tests.views.api.common import ApiTests
 
 
-class StopApiTest(TestCase):
+class StopApiTests(ApiTests):
     api_name = 'stop'
 
     def setUp(self):
+        super(StopApiTests, self).setUp()
+
         def create_car(loc, number, route=511, active=True):
             return Car.objects.create(
                 number=number,
@@ -25,9 +28,13 @@ class StopApiTest(TestCase):
                                         location=[-79.411286, 43.666532],
                                         route=511)
 
-    def test_data_correct(self):
+    def test_auth_required(self):
         response = self.client.get(reverse(self.api_name,
                                            args=(self.stop.number,)))
+        self.assertEquals(response.status_code, 403)
+
+    def test_data_correct(self):
+        response = self._make_get((self.stop.number,))
         self.assertEquals(response.status_code, 200)
 
         expected_cars = [self.closest, self.closer, self.close]
@@ -46,5 +53,27 @@ class StopApiTest(TestCase):
             self.assertEquals(car['number'], expected_cars[i].number)
             self.assertSequenceEqual(car['location'],
                                       expected_cars[i].location)
+
+    def test_shows_checkin_url_when_not_riding(self):
+        profile = self.user.get_profile()
+        profile.riding = None
+        profile.save()
+
+        response = self._make_get((self.stop.number,))
+        data = json.loads(response.content)
+        for car in data['cars_nearby']:
+            self.assertNotIn('checkout_url', car)
+            self.assertIn('checkin_url', car)
             self.assertEquals(car['checkin_url'],
-                reverse('car-checkin', args=(expected_cars[i].number,)))
+                              reverse('car-checkin', args=(car['number'],)))
+
+    def test_shows_checkout_url_when_riding(self):
+        profile = self.user.get_profile()
+        profile.check_in(self.close, self.stop)
+
+        response = self._make_get((self.stop.number,))
+        data = json.loads(response.content)
+        for car in data['cars_nearby']:
+            self.assertNotIn('checkin_url', car)
+            self.assertIn('checkout_url', car)
+            self.assertEquals(car['checkout_url'], reverse('car-checkout'))

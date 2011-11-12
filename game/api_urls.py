@@ -1,9 +1,7 @@
 from django.conf.urls.defaults import *
 
-from rockt.game.resources import StopResource
 from rockt.game.views.api.car import *
-from rockt.game.views.api.common import ReadOnlyModelView
-from rockt.game.views.api.stop import StopFindView
+from rockt.game.views.api.stop import StopView, StopFindView
 from rockt.game.views.api.user import UserCarListView, UserCarView, UserView
 
 
@@ -24,7 +22,7 @@ urlpatterns = patterns('api',
         CarTimelineView.as_view(),
         name='car-timeline'),
     url(r'^stop/(?P<number>[^/]+)/$',
-        ReadOnlyModelView.as_view(resource=StopResource),
+        StopView.as_view(),
         name='stop'),
     url(r'^stop/find/(?P<lat>[^/]+)/(?P<lon>[^/]+)/$',
         StopFindView.as_view(),
