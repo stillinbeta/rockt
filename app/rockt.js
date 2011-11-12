@@ -81,20 +81,12 @@ function failure(jqXHR) {
 function loadStopList() {
     $.mobile.showPageLoadingMsg();
     jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
-    .success(function(data) { loadedStopList(data) } )
+    .success(loadMap)
     .error(failure);
 }
 
-function loadedStopList(data) { 
-    loadMap(data, 'Select a stop', function (stop) {
-        return '<a style="color: black;" href="javascript:loadStop(\''
-            + stop.url + '\')">' + stop.description + ' (' 
-            + stop.number + ')</a>';
-    });
-}
-    
-function loadMap(data, title, infoFunc) {
-    $('#map-name').html(title); 
+function loadMap(data) {
+    $('#map-name').text('Select a stop'); 
     $.mobile.changePage($('#map'));
     initMap();
     markers.map( function(point) {
@@ -111,7 +103,9 @@ function loadMap(data, title, infoFunc) {
             map: map 
         }); 
         var infoWindow = new google.maps.InfoWindow({
-            content: infoFunc(stop)
+            content: '<a style="color: black;" href="javascript:loadStop(\''
+            + stop.url + '\')">' + stop.description + ' (' 
+            + stop.number + ')</a>'
         });
         google.maps.event.addListener(point, 'click', function() {
             infoWindow.open(map, point);
@@ -127,27 +121,34 @@ function loadMap(data, title, infoFunc) {
 
 function loadStop(url) {
     $.mobile.showPageLoadingMsg();
-    $.getJSON( url )
+    $.fn.authAjax(url, {}, 'GET')
     .success(loadedStop)
     .error(failure);
 }
 
 function loadedStop(data) {
-    $('#stop-description').html(data.description);
-    $('#car-list li[data-role!=list-divider]').remove(); 
-    var list = $('#car-list');
-    $.each(data.cars_nearby, function(index, car) {
-        var link = $('<a href="">' + car.number + '</a>'); 
-        link.click(function(event) { checkInConfirm(car.number, 
-                                                    data.number,
-                                                    car.checkin_url)
-                                   });
-        list.append($('<li />').append(link));
-    });
+    if (data.checkout_url) {
+        console.debug('Hullo');
+        checkOutConfirm(data.number, data.checkout_url);
+    }
+    else {
+        $('#stop-description').html(data.description);
+        $('#car-list li[data-role!=list-divider]').remove(); 
 
-    $.mobile.hidePageLoadingMsg();
-    $.mobile.changePage($('#stop'));
-    list.listview('refresh');
+        var list = $('#car-list');
+        $.each(data.cars_nearby, function(index, car) {
+            var link = $('<a href="">' + car.number + '</a>'); 
+            link.click(function(event) { checkInConfirm(car.number, 
+                                                        data.number,
+                                                        car.checkin_url)
+                                       });
+            list.append($('<li />').append(link));
+        });
+
+        $.mobile.hidePageLoadingMsg();
+        $.mobile.changePage($('#stop'));
+        list.listview('refresh');
+    }
 }
 
 function checkInConfirm(carNumber, stopNumber, url) {
@@ -161,20 +162,30 @@ function checkInConfirm(carNumber, stopNumber, url) {
 function checkIn(stopNumber, url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {'stop_number': stopNumber})
-    .success(checkedIn)
+    .success(loadUserData)
     .error(failure);
 }
+    
+function checkOutConfirm(stopNumber, url) {
+    $('#confirm-title').text('Check out');
+    $('#confirm-confirm').val('Check out').bind('tap', function() {
+        checkOut(stopNumber, url);
+    }); 
+    $.mobile.hidePageLoadingMsg();
+    $('<a href="#confirm" data-rel="dialog" />').click();
+}
+
+function checkOut(stopNumber, url) {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(url, {'stop_number': stopNumber})
+    .success(loadUserData)
+    .error(failure);
+}
+
 function loadUserData() {
     $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
     .success(loadedUserData)
     .error(failure);
-}
-    
-function checkedIn() {
-    $('#home-checkinout')
-    .replaceWith(makeButton('Check out', 'home-checkinout'));
-    $.mobile.hidePageLoadingMsg();
-    $.mobile.changePage($('#home'));
 }
 
 function loadedUserData(data) {
@@ -185,10 +196,10 @@ function loadedUserData(data) {
     else {
         var button = makeButton('Check In', 'home-checkinout');
     }
+    button.bind('tap', loadStopList);
     $('#home-checkinout').replaceWith(button);
     $.mobile.hidePageLoadingMsg();
+    $.mobile.changePage($('#home'));
 }
-
-
 
 $(document).ready(init);
