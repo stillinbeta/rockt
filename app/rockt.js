@@ -1,17 +1,56 @@
 //var api_url = 'https://rockt.ca/api/'
-var apiUrl = 'http://192.168.1.42:8000/api/'
+//var apiUrl = 'http://192.168.111.156:8000/api/'
+apiUrl = '/api/'
 var markers = [];
 var map;
 var bounds;
+var username='ellie';
+var password='test';
 
+(function($) {
+    $.fn.authAjax= function(url) {
+        if (!arguments[1]) {
+            arguments[1] = {}
+        }
+        data = arguments[1];
+
+        if (!arguments[2]) {
+            arguments[2] = 'POST'
+        }
+        method = arguments[2]; 
+
+        return $.ajax(url, {
+            data: data,
+            type: method, 
+            beforeSend: function(xhr) { 
+                xhr.setRequestHeader("Authorization",
+                    "Basic " + $.base64Encode(username + ':' + password));
+            }
+        });
+    }
+})(jQuery);
+
+function makeButton(text) {
+    var button = $('<a />')
+    .text(text)
+    .attr('data-role', 'button')
+    .attr('data-theme', 'a')
+    .buttonMarkup();
+    if (arguments[1]) {
+        button.attr('id', arguments[1]);
+    }
+    return button;
+}
 
 function addFooter() {
     $('.footer').html('stillinbeta | $00');
 }
 
 function init() {
+    $.mobile.showPageLoadingMsg();
     addFooter();
-  //  initMap();
+    loadUserData();
+    $.mobile.changePage('#home');
 }
 
 function initMap() {
@@ -27,17 +66,23 @@ function initMap() {
         myOptions); 
 }
 
-function failure(message) {
-    $('#error-content').html(message);
+function failure(jqXHR) {
+    try {
+        var message = jqXHR.status +': ' 
+            + $.parseJSON(jqXHR.responseText).detail
+    }
+    catch(e) {
+        var message = jqXHR.status + ': Something bad happened';
+    }
+    $('#error-content').text(message);
     $('<a href="#error" data-rel="dialog" />').click();
 }
     
-
 function loadStopList() {
     $.mobile.showPageLoadingMsg();
     jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
     .success(function(data) { loadedStopList(data) } )
-    .error(function(err) { failure('Error retriving stops'); } );
+    .error(failure);
 }
 
 function loadedStopList(data) { 
@@ -83,8 +128,8 @@ function loadMap(data, title, infoFunc) {
 function loadStop(url) {
     $.mobile.showPageLoadingMsg();
     $.getJSON( url )
-    .success(function(data) { loadedStop(data); })
-    .error(function() { failure('Error retriving nearby cars'); } );
+    .success(loadedStop)
+    .error(failure);
 }
 
 function loadedStop(data) {
@@ -98,7 +143,6 @@ function loadedStop(data) {
                                                     car.checkin_url)
                                    });
         list.append($('<li />').append(link));
-        console.debug(car.number);
     });
 
     $.mobile.hidePageLoadingMsg();
@@ -108,12 +152,43 @@ function loadedStop(data) {
 
 function checkInConfirm(carNumber, stopNumber, url) {
     $('#confirm-title').html('Check in on ' + carNumber);   
-    $('#confirm-confirm').html('Check in');
+    $('#confirm-confirm').val('Check in').bind('tap', function() {
+        checkIn(stopNumber, url);
+    });
     $('<a href="#confirm" data-rel="dialog" />').click();
 }
 
-function loadCheckIn(stop,url) {
-       
+function checkIn(stopNumber, url) {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(url, {'stop_number': stopNumber})
+    .success(checkedIn)
+    .error(failure);
+}
+function loadUserData() {
+    $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
+    .success(loadedUserData)
+    .error(failure);
+}
+    
+function checkedIn() {
+    $('#home-checkinout')
+    .replaceWith(makeButton('Check out', 'home-checkinout'));
+    $.mobile.hidePageLoadingMsg();
+    $.mobile.changePage($('#home'));
 }
 
-$( document ).ready(init);
+function loadedUserData(data) {
+    $('.footer').html( data.username + ' | $' + data.balance ); 
+    if (data.check_out_url) {
+        var button = makeButton('Check Out', 'home-checkinout');
+    } 
+    else {
+        var button = makeButton('Check In', 'home-checkinout');
+    }
+    $('#home-checkinout').replaceWith(button);
+    $.mobile.hidePageLoadingMsg();
+}
+
+
+
+$(document).ready(init);

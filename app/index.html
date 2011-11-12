@@ -10,13 +10,14 @@
 	<script src="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.js"></script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="rockt.js"></script>
+    <script src="jquery-base64.js"></script>
 </head> 
 <body> 
     <div id="home" data-role="page" data-theme="a">
         <div data-role="header"><h1>Rockt</h1></div>
         <div data-role="content">
-            <a href="javascript:loadStopList()" data-role="button">Check In</a>
-            <a href="javascript:loadStop('http://192.168.1.42:8000/api/stop/07355/')" data-role="button">Fleet Map</a>
+          <a id="home-checkinout"></a>
+            <a href="javascript:loadStop('/api/stop/07355/')" data-role="button">Fleet Map</a>
             <a href="javascript:error('oops')" data-role="button">Fleet</a>
         </div>
         <div data-role="footer" data-position="fixed">
@@ -34,8 +35,10 @@
     </div>
     <div id="error" data-role="page">
         <div data-role="header"><h1>Error</h1></div>
-        <div data-role="content" id="error-content">
-            Sorry, that didn't work. 
+        <div data-role="content">
+            <h2 id="error-content">
+                Sorry, that didn't work. 
+            </h2>
         </div>
     </div>
     <div id="map" data-role="page" data-theme="a">
@@ -55,10 +58,10 @@
         <div data-role="content">
             <h2 id="message"></h2>
             <div class="ui-grid-a">
-                <div class="ui-block-a"><a href="#" 
-                   data-role="button"
+                <div class="ui-block-a"><input type="button" 
                    data-icon="check"
-                   id="confirm-confirm"></a></div>
+                   value="test"
+                   id="confirm-confirm" /></div>
                 <div class="ui-block-b"><a href="#" 
                    data-role="button" 
                    data-rel="back"
