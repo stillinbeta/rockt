@@ -30,17 +30,18 @@ class StopView(AuthRequiredView):
         dic = dict()
         for field in self.fields:
             dic[field] = getattr(stop, field)
-        dic['cars_nearby'] = []
 
-        limit = settings.CAR_SEARCH_LIMIT
-        checked_in = self.user.get_profile().riding != None
-        for car in Car.objects.find_nearby(stop)[:limit]:
-            car_dic = {'number': car.number,
-                   'location': car.location}
-            if checked_in:
-                car_dic['checkout_url'] = reverse('car-checkout')
-            else:
-                car_dic['checkin_url'] = reverse('car-checkin',
-                                                 args=(car.number,))
-            dic['cars_nearby'].append(car_dic)
+        if self.user.get_profile().riding != None:
+            dic['checkout_url'] = reverse('car-checkout')
+        else:
+            dic['cars_nearby'] = []
+            limit = settings.CAR_SEARCH_LIMIT
+            checked_in = self.user.get_profile().riding != None
+            for car in Car.objects.find_nearby(stop)[:limit]:
+                car_dic = {'number': car.number,
+                          'location': car.location,
+                          'checkin_url': reverse('car-checkin',
+                                                 args=(car.number,))}
+                dic['cars_nearby'].append(car_dic)
+
         return dic

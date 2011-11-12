@@ -54,15 +54,15 @@ class StopApiTests(ApiTests):
             self.assertSequenceEqual(car['location'],
                                       expected_cars[i].location)
 
-    def test_shows_checkin_url_when_not_riding(self):
+    def test_shows_checkin_urls_when_not_riding(self):
         profile = self.user.get_profile()
         profile.riding = None
         profile.save()
 
         response = self._make_get((self.stop.number,))
         data = json.loads(response.content)
+        self.assertNotIn('checkout_url', data)
         for car in data['cars_nearby']:
-            self.assertNotIn('checkout_url', car)
             self.assertIn('checkin_url', car)
             self.assertEquals(car['checkin_url'],
                               reverse('car-checkin', args=(car['number'],)))
@@ -73,7 +73,6 @@ class StopApiTests(ApiTests):
 
         response = self._make_get((self.stop.number,))
         data = json.loads(response.content)
-        for car in data['cars_nearby']:
-            self.assertNotIn('checkin_url', car)
-            self.assertIn('checkout_url', car)
-            self.assertEquals(car['checkout_url'], reverse('car-checkout'))
+        self.assertNotIn('cars_nearby', data)
+        self.assertIn('checkout_url', data)
+        self.assertEquals(data['checkout_url'], reverse('car-checkout'))
