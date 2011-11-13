@@ -1,11 +1,11 @@
 //var api_url = 'https://rockt.ca/api/'
 //var apiUrl = 'http://192.168.111.156:8000/api/'
 apiUrl = '/api/'
-var markers = [];
-var map;
-var bounds;
 var username='ellie';
 var password='test';
+
+var markers = [];
+var map;
 
 (function($) {
     $.fn.authAjax= function(url) {
@@ -43,28 +43,63 @@ function makeButton(text) {
     return button;
 }
 
-function addFooter() {
-    $('.footer').html('stillinbeta | $00');
-}
-
-function init() {
-    $.mobile.showPageLoadingMsg();
-    addFooter();
-    loadUserData();
-    $.mobile.changePage('#home');
-}
-
-function initMap() {
+function loadMap(data, title, infoFunc) {
+    $('#map-name').text(title); 
+    $.mobile.changePage($('#map'));
     $('#map-content').css('padding','0');
     $('#map-content').height($('#map').height() - $('#map div:first').height() - 2);
-    var latlng = new google.maps.LatLng(43.6547, -79.3739);
-    var myOptions = { 
-        center: latlng,
-        zoom: 12,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    map = new google.maps.Map(document.getElementById('map-content'),
-        myOptions); 
+    if (!map) {
+        var latlng = new google.maps.LatLng(43.6547, -79.3739);
+        var myOptions = { 
+            center: latlng,
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById('map-content'),
+                myOptions); 
+    }
+    $.each(markers, function(index, point) {
+            point.setMap(null);
+            });
+    markers = []; 
+    var bounds = new google.maps.LatLngBounds();
+    $.each(data, function(index, stop) {
+            var location = new google.maps.LatLng(stop.location[1], 
+                stop.location[0]);
+            var point = new google.maps.Marker({
+position: location,
+map: map 
+}); 
+            var infoWindow = new google.maps.InfoWindow({
+content: infoFunc(stop)
+});
+            google.maps.event.addListener(point, 'click', function() {
+                infoWindow.open(map, point);
+                });  
+            bounds.extend(location);
+            markers.push(point); 
+            });
+map.fitBounds(bounds);
+google.maps.event.addListener(map, 'tilesloaded', function() {
+        $.mobile.hidePageLoadingMsg();
+        });
+}
+
+function loadList(data, header, title, itemFunc, itemBind) {
+    $('#list-description').text(header);
+    $('#list-name').text(title);
+    $('#list-list li[data-role!=list-divider]').remove(); 
+
+    var list = $('#list-list');
+    $.each(data, function(index, car) {
+            var link = $('<a />').text(itemFunc(car)); 
+            link.bind('tap', itemBind(car));
+            list.append($('<li />').append(link));
+            });
+
+    $.mobile.hidePageLoadingMsg();
+    $.mobile.changePage($('#list'));
+    list.listview('refresh');
 }
 
 function failure(jqXHR) {
@@ -78,103 +113,79 @@ function failure(jqXHR) {
     $('#error-content').text(message);
     $('<a href="#error" data-rel="dialog" />').click();
 }
-    
-function loadStopList() {
-    $.mobile.showPageLoadingMsg();
-    jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
-    .success(loadedStopList);
-}
-
-function loadedStopList(data) { 
-    loadMap(data, 'Select a stop', function (stop) {
-        return '<a style="color: black;" href="javascript:loadStop(\''
-            + stop.url + '\')">' + stop.description + ' (' 
-            + stop.number + ')</a>';
-    });
-}
-    
-function loadMap(data, title, infoFunc) {
-    $('#map-name').html(title); 
-    $.mobile.changePage($('#map'));
-    initMap();
-    markers.map( function(point) {
-        point.setMap(null);
-    });
-    markers = [];
-    
-    bounds = new google.maps.LatLngBounds();
-    $.each(data, function(index, stop) {
-        var location = new google.maps.LatLng(stop.location[1], 
-            stop.location[0]);
-        var point = new google.maps.Marker({
-            position: location,
-            map: map 
-        }); 
-        var infoWindow = new google.maps.InfoWindow({
-            content: infoFunc(stop)
-        });
-        google.maps.event.addListener(point, 'click', function() {
-            infoWindow.open(map, point);
-        });  
-        bounds.extend(location);
-        markers.push(point); 
-    });
-    map.fitBounds(bounds);
-    google.maps.event.addListener(map, 'tilesloaded', function() {
-        $.mobile.hidePageLoadingMsg();
-    });
-}
-
-function loadList(data, header, title, itemFunc, itemBind) {
-    $('#list-description').text(header);
-    $('#list-name').text(title);
-    $('#list-list li[data-role!=list-divider]').remove(); 
-
-    var list = $('#list-list');
-    $.each(data, function(index, car) {
-        var link = $('<a />').text(itemFunc(car)); 
-        link.bind('tap', itemBind(car));
-        list.append($('<li />').append(link));
-    });
-
-    $.mobile.hidePageLoadingMsg();
-    $.mobile.changePage($('#list'));
-    list.listview('refresh');
-}
-
-
-function loadStop(url) {
-    $.mobile.showPageLoadingMsg();
-    $.fn.authAjax(url, {}, 'GET')
-    .success(loadedStop);
-}
-
-function loadedStop(data) {
-    if (data.checkout_url) {
-        checkOutConfirm(data.number, data.checkout_url);
-    }
-    else {
-        loadList(data.cars_nearby,
-                 data.description,
-                 'Check in',
-                 function (car) { return car.number },
-                 function (car) { 
-                     return function() {
-                         checkInConfirm(car.number,
-                                        data.number,
-                                        car.checkin_url)
-                     }
-                }
-        );
-    }
-}
 
 function confirmation(message, button, handler) {
     $('#confirm-title').html(message);   
     $('#confirm-confirm').replaceWith(makeButton(button, 'confirm-confirm')
-        .attr('data-icon', 'check')
-        .one('tap', handler));
+            .attr('data-icon', 'check')
+            .one('tap', handler));
     $('<a href="#confirm" data-rel="dialog" />').click();
+}
+
+function loadUserData() {
+    $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
+    .success(loadedUserData);
+
+    function loadedUserData(data) {
+        $('.footer').html( data.username + ' | $' + data.balance ); 
+        if (data.check_out_url) {
+            var button = makeButton('Check Out', 'home-checkinout');
+        } 
+        else {
+            var button = makeButton('Check In', 'home-checkinout');
+        }
+        button.unbind('tap').bind('tap', loadStopList);
+        $('#home-checkinout').replaceWith(button);
+        $.mobile.hidePageLoadingMsg();
+    }
+}
+
+function init() {
+    $.mobile.showPageLoadingMsg();
+    loadUserData();
+    $.mobile.changePage('#home');
+}
+
+$(document).ready(init);
+ 
+function loadStopList() {
+    $.mobile.showPageLoadingMsg();
+    jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
+    .success(loadedStopList);
+
+    function loadedStopList(data) { 
+        loadMap(data, 'Select a stop', function (stop) {
+            return '<a style="color: black;" href="javascript:loadStop(\''
+                + stop.url + '\')">' + stop.description + ' (' 
+                + stop.number + ')</a>';
+        });
+    }
+}
+    
+function loadStop(url) {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(url, {}, 'GET')
+    .success(loadedStop);
+
+    function loadedStop(data) {
+        if (data.checkout_url) {
+            checkOutConfirm(data.number, data.checkout_url);
+        }
+        else {
+            loadList(data.cars_nearby,
+                     data.description,
+                     'Check in',
+                     function (car) { return car.number },
+                     function (car) { 
+                         return function() {
+                             checkInConfirm(car.number,
+                                            data.number,
+                                            car.checkin_url)
+                         }
+                    }
+            );
+        }
+    }
 }
 
 function checkInConfirm(carNumber, stopNumber, url) {
@@ -211,21 +222,21 @@ function checkOut(stopNumber, url) {
         loadUserData();
         checkedOut(data);
     });
-}
 
-function checkedOut(data) {
-    $('#checkedout-fare').text(data.fare);
-    if (data.purchase) {
-        $('#purchase-div').show();
-        $('#purchase-price').text(data.purchase.price);
-        $('#purchase-link').one('tap', function() {
-            purchaseConfirm(data.purchase.url);
-        });
+    function checkedOut(data) {
+        $('#checkedout-fare').text(data.fare);
+        if (data.purchase) {
+            $('#purchase-div').show();
+            $('#purchase-price').text(data.purchase.price);
+            $('#purchase-link').unbind('tap').bind('tap', function() {
+                purchaseConfirm(data.purchase.url);
+            });
+        }
+        else {
+            $('#purchase-div').hide(); 
+        }
+        $.mobile.changePage($('#checkedout'));
     }
-    else {
-        $('#purchase-div').hide(); 
-    }
-    $.mobile.changePage($('#checkedout'));
 }
     
 function purchaseConfirm(url) {
@@ -245,69 +256,77 @@ function purchase(url) {
     });
 }
 
-function loadUserData() {
-    $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
-    .success(loadedUserData);
-}
-
-function loadedUserData(data) {
-    $('.footer').html( data.username + ' | $' + data.balance ); 
-    if (data.check_out_url) {
-        var button = makeButton('Check Out', 'home-checkinout');
-    } 
-    else {
-        var button = makeButton('Check In', 'home-checkinout');
-    }
-    button.one('tap', loadStopList);
-    $('#home-checkinout').replaceWith(button);
-    $.mobile.hidePageLoadingMsg();
-}
-
 function loadFleetMap() {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
     .success(loadedFleetMap);
-}
 
-function loadedFleetMap(data) {
-    loadMap(data, 'Fleet', function(car) {
-        return 'Car ' + car.number;
-    });
+    function loadedFleetMap(data) {
+        loadMap(data, 'Fleet', function(car) {
+            return 'Car ' + car.number;
+        });
+    }
 }
 
 function loadFleet() {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
     .success(loadedFleet);
-}
 
-function loadedFleet(data) {
-    loadList(data,
-             'Fleet',
-             'Fleet',
-             function (car) { return car.number },
-             function (car) { return function() { loadCar(car.stats_url); }}
-    );
+    function loadedFleet(data) {
+        loadList(data,
+                 'Fleet',
+                 'Fleet',
+                 function (car) { return car.number },
+                 function (car) { return function() { loadCar(car.stats_url); }}
+        );
+    }
 }
 
 function loadCar(url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {}, 'GET')
     .success(loadedCar);
+
+    function loadedCar(data) {
+        $('#car-route').text(data.route);
+        $('#car-active').text(data.active && 'Active' || 'Inactive');
+
+        $('#car-owner-revenue').text(data.owner_fares.revenue);
+        $('#car-total-revenue').text(data.total_fares.revenue);
+                
+        $('#car-owner-riders').text(data.owner_fares.riders);
+        $('#car-total-riders').text(data.total_fares.riders);
+
+        $('#car-sell').unbind('tap')
+        .bind('tap', function() { 
+            confirmSell(data.sell_car_url,
+                        data.number);
+        });
+                            
+
+        $.mobile.changePage($('#car'));
+        $.mobile.hidePageLoadingMsg();
+    }            
 }
-    
-function loadedCar(data) {
-    $('#car-route').text(data.route);
-    $('#car-active').text(data.active && 'Active' || 'Inactive');
 
-    $('#car-owner-revenue').text(data.owner_fares.revenue);
-    $('#car-total-revenue').text(data.total_fares.revenue);
-            
-    $('#car-owner-riders').text(data.owner_fares.riders);
-    $('#car-total-riders').text(data.total_fares.riders);
+function confirmSell(url, number) {
+    confirmation('Sell ' + number + '?',
+                 'Sell',
+                 function() { sell(url); });
 
-    $.mobile.changePage($('#car'));
-    $.mobile.hidePageLoadingMsg();
-}            
 
-$(document).ready(init);
+    function sell(url) {
+        $.mobile.showPageLoadingMsg();
+        $.fn.authAjax(url)
+        .success(sold);
+
+        
+    }
+
+    function sold() {
+            loadUserData();
+            loadFleet();
+    }
+
+}
