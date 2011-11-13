@@ -26,7 +26,8 @@ var password='test';
                 xhr.setRequestHeader("Authorization",
                     "Basic " + $.base64Encode(username + ':' + password));
             }
-        });
+        })
+        .error(failure);
     }
 })(jQuery);
 
@@ -81,12 +82,19 @@ function failure(jqXHR) {
 function loadStopList() {
     $.mobile.showPageLoadingMsg();
     jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
-    .success(loadMap)
-    .error(failure);
+    .success(loadedStopList);
 }
 
-function loadMap(data) {
-    $('#map-name').text('Select a stop'); 
+function loadedStopList(data) { 
+    loadMap(data, 'Select a stop', function (stop) {
+        return '<a style="color: black;" href="javascript:loadStop(\''
+            + stop.url + '\')">' + stop.description + ' (' 
+            + stop.number + ')</a>';
+    });
+}
+    
+function loadMap(data, title, infoFunc) {
+    $('#map-name').html(title); 
     $.mobile.changePage($('#map'));
     initMap();
     markers.map( function(point) {
@@ -103,9 +111,7 @@ function loadMap(data) {
             map: map 
         }); 
         var infoWindow = new google.maps.InfoWindow({
-            content: '<a style="color: black;" href="javascript:loadStop(\''
-            + stop.url + '\')">' + stop.description + ' (' 
-            + stop.number + ')</a>'
+            content: infoFunc(stop)
         });
         google.maps.event.addListener(point, 'click', function() {
             infoWindow.open(map, point);
@@ -119,73 +125,129 @@ function loadMap(data) {
     });
 }
 
+function loadList(data, header, title, itemFunc, itemBind) {
+    $('#list-description').text(header);
+    $('#list-name').text(title);
+    $('#list-list li[data-role!=list-divider]').remove(); 
+
+    var list = $('#list-list');
+    $.each(data, function(index, car) {
+        var link = $('<a />').text(itemFunc(car)); 
+        link.bind('tap', itemBind(car));
+        list.append($('<li />').append(link));
+    });
+
+    $.mobile.hidePageLoadingMsg();
+    $.mobile.changePage($('#list'));
+    list.listview('refresh');
+}
+
+
 function loadStop(url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {}, 'GET')
-    .success(loadedStop)
-    .error(failure);
+    .success(loadedStop);
 }
 
 function loadedStop(data) {
     if (data.checkout_url) {
-        console.debug('Hullo');
         checkOutConfirm(data.number, data.checkout_url);
     }
     else {
-        $('#stop-description').html(data.description);
-        $('#car-list li[data-role!=list-divider]').remove(); 
-
-        var list = $('#car-list');
-        $.each(data.cars_nearby, function(index, car) {
-            var link = $('<a href="">' + car.number + '</a>'); 
-            link.click(function(event) { checkInConfirm(car.number, 
-                                                        data.number,
-                                                        car.checkin_url)
-                                       });
-            list.append($('<li />').append(link));
-        });
-
-        $.mobile.hidePageLoadingMsg();
-        $.mobile.changePage($('#stop'));
-        list.listview('refresh');
+        loadList(data.cars_nearby,
+                 data.description,
+                 'Check in',
+                 function (car) { return car.number },
+                 function (car) { 
+                     return function() {
+                         checkInConfirm(car.number,
+                                        data.number,
+                                        car.checkin_url)
+                     }
+                }
+        );
     }
 }
 
-function checkInConfirm(carNumber, stopNumber, url) {
-    $('#confirm-title').html('Check in on ' + carNumber);   
-    $('#confirm-confirm').val('Check in').bind('tap', function() {
-        checkIn(stopNumber, url);
-    });
+function confirmation(message, button, handler) {
+    $('#confirm-title').html(message);   
+    $('#confirm-confirm').replaceWith(makeButton(button, 'confirm-confirm')
+        .attr('data-icon', 'check')
+        .one('tap', handler));
     $('<a href="#confirm" data-rel="dialog" />').click();
+}
+
+function checkInConfirm(carNumber, stopNumber, url) {
+    confirmation('Check in on ' + carNumber,
+                 'Check in',
+                 function() {
+                    checkIn(stopNumber, url);
+                 });
 }
 
 function checkIn(stopNumber, url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {'stop_number': stopNumber})
-    .success(loadUserData)
-    .error(failure);
+    .success(function() {
+        loadUserData();
+        $.mobile.changePage($('#home'))
+    });
 }
     
 function checkOutConfirm(stopNumber, url) {
-    $('#confirm-title').text('Check out');
-    $('#confirm-confirm').val('Check out').bind('tap', function() {
-        checkOut(stopNumber, url);
-    }); 
+    confirmation('Check out',
+                 'Check out',
+                 function() {
+                     console.debug(url);
+                     checkOut(stopNumber, url);
+                 }); 
     $.mobile.hidePageLoadingMsg();
-    $('<a href="#confirm" data-rel="dialog" />').click();
 }
 
 function checkOut(stopNumber, url) {
     $.mobile.showPageLoadingMsg();
-    $.fn.authAjax(url, {'stop_number': stopNumber})
-    .success(loadUserData)
-    .error(failure);
+    $.fn.authAjax(url, {stop_number: stopNumber})
+    .success(function(data) {
+        loadUserData();
+        checkedOut(data);
+    });
+}
+
+function checkedOut(data) {
+    $('#checkedout-fare').text(data.fare);
+    if (data.purchase) {
+        $('#purchase-div').show();
+        $('#purchase-price').text(data.purchase.price);
+        $('#purchase-link').one('tap', function() {
+            purchaseConfirm(data.purchase.url);
+        });
+    }
+    else {
+        $('#purchase-div').hide(); 
+    }
+    $.mobile.changePage($('#checkedout'));
+}
+    
+function purchaseConfirm(url) {
+    confirmation('Purchase?',
+                 'Purchase',
+                 function() {
+                     purchase(url);
+                 });
+}
+
+function purchase(url) {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(url)
+    .success(function(data) {
+        loadUserData();
+        $.mobile.changePage($('#home'));
+    });
 }
 
 function loadUserData() {
     $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
-    .success(loadedUserData)
-    .error(failure);
+    .success(loadedUserData);
 }
 
 function loadedUserData(data) {
@@ -196,10 +258,56 @@ function loadedUserData(data) {
     else {
         var button = makeButton('Check In', 'home-checkinout');
     }
-    button.bind('tap', loadStopList);
+    button.one('tap', loadStopList);
     $('#home-checkinout').replaceWith(button);
     $.mobile.hidePageLoadingMsg();
-    $.mobile.changePage($('#home'));
 }
+
+function loadFleetMap() {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
+    .success(loadedFleetMap);
+}
+
+function loadedFleetMap(data) {
+    loadMap(data, 'Fleet', function(car) {
+        return 'Car ' + car.number;
+    });
+}
+
+function loadFleet() {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
+    .success(loadedFleet);
+}
+
+function loadedFleet(data) {
+    loadList(data,
+             'Fleet',
+             'Fleet',
+             function (car) { return car.number },
+             function (car) { return function() { loadCar(car.stats_url); }}
+    );
+}
+
+function loadCar(url) {
+    $.mobile.showPageLoadingMsg();
+    $.fn.authAjax(url, {}, 'GET')
+    .success(loadedCar);
+}
+    
+function loadedCar(data) {
+    $('#car-route').text(data.route);
+    $('#car-active').text(data.active && 'Active' || 'Inactive');
+
+    $('#car-owner-revenue').text(data.owner_fares.revenue);
+    $('#car-total-revenue').text(data.total_fares.revenue);
+            
+    $('#car-owner-riders').text(data.owner_fares.riders);
+    $('#car-total-riders').text(data.total_fares.riders);
+
+    $.mobile.changePage($('#car'));
+    $.mobile.hidePageLoadingMsg();
+}            
 
 $(document).ready(init);

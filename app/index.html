@@ -17,21 +17,12 @@
         <div data-role="header"><h1>Rockt</h1></div>
         <div data-role="content">
           <a id="home-checkinout"></a>
-            <a href="javascript:loadStop('/api/stop/07355/')" data-role="button">Fleet Map</a>
-            <a href="javascript:error('oops')" data-role="button">Fleet</a>
+            <a href="javascript:loadFleetMap()" data-role="button">Fleet Map</a>
+            <a href="javascript:loadFleet()" data-role="button">Fleet</a>
         </div>
         <div data-role="footer" data-position="fixed">
             <h2 class="footer"></h2>
         </div>
-    </div>
-    <div id="loaded" data-role="page" data-theme="a">
-        <div data-role="header"><h1>All done</h1></div>
-        <div data-role="content">
-            Just a testing thing...
-        </div>
-        <div data-role="footer" data-position="fixed">
-            <h2 class="footer"></h2>
-        </div> 
     </div>
     <div id="error" data-role="page">
         <div data-role="header"><h1>Error</h1></div>
@@ -45,11 +36,11 @@
         <div data-role="header"><h1 id="map-name"></h1></div>
         <div data-role="content" id="map-content"></div>
     </div>
-    <div id="stop" data-role="page" data-theme="a">
-        <div data-role="header"><h1 id="stop-description">Choose a car</h1></div>
+    <div id="list" data-role="page" data-theme="a">
+        <div data-role="header"><h1 id="list-description">Choose a car</h1></div>
         <div data-role="content">
-            <ul data-role="listview" data-inset="true" data-theme="a" id="car-list">
-                <li data-role="list-divider" id="stop-name">Check In</li>
+            <ul data-role="listview" data-inset="true" data-theme="a" id="list-list">
+                <li data-role="list-divider" id="list-name">Check In</li>
             </ul>
         </div>
     </div>
@@ -58,10 +49,11 @@
         <div data-role="content">
             <h2 id="message"></h2>
             <div class="ui-grid-a">
-                <div class="ui-block-a"><input type="button" 
+                <div class="ui-block-a"><a 
+                   data-role="button"
                    data-icon="check"
                    value="test"
-                   id="confirm-confirm" /></div>
+                   id="confirm-confirm"></a></div>
                 <div class="ui-block-b"><a href="#" 
                    data-role="button" 
                    data-rel="back"
@@ -69,6 +61,52 @@
             </div>
         </div>
     </div>
+    <div id="checkedout" data-role="page" data-theme="a">
+        <div data-role="header"><h1>Recipt</h1></div>
+        <div data-role"content">
+            <h3>Your last fare was $<span id="checkedout-fare"></span></h3>
+            <a data-role="button" href="#home">Home</a>
+            <div id="purchase-div">
+                <h2>This car is available for Purchase</h2>
+                <h3>Price: $<span id="purchase-price"></span></h3>
+                <a data-role="button" data-icon="plus"
+                   id="purchase-link">Purchase</a>
+            </div>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h2 class="footer"></h2>
+        </div>
+    </div>
+    <div id="car" data-role="page" data-theme="a">
+        <div data-role="header"><h1 id="car-number"></h1></div>
+        <div data-role="content">
+            <h2 id="car-route"></h2>
+            <h2 id="car-active"></h2>
+
+            <div class="ui-grid-b">
+                <div class="ui-block-a"></div>
+                <div class="ui-block-b"><h3>Under You</h3></div>
+                <div class="ui-block-c"><h3>Lifetime</h3></div>
+            </div>
+            <div class="ui-grid-b">
+                <div class="ui-block-a"><h3>Revenue</h3></div>
+                <div class="ui-block-b">
+                    <h4>$<span id="car-owner-revenue"</span></h4></div>
+                <div class="ui-block-c">
+                    <h4>$<span id="car-total-revenue"</span></h4>
+                </div>
+            </div>
+            <div class="ui-grid-b">
+                <div class="ui-block-a"><h3>Riders</h3></div>
+                <div class="ui-block-b">
+                    <h4><span id="car-owner-riders"</span> Riders</h4>
+                </div>
+                <div class="ui-block-c">
+                    <h4><span id="car-total-riders"</span> Riders</h4>
+                </div>
+            </div>
+            <a id="car-sell" data-role="button" data-theme="a">Sell</a>
+                
             
 </body>	
 </html>
