@@ -36,7 +36,7 @@ class CheckOutView(AuthRequiredView):
                     'price': get_rule('RULE_GET_STREETCAR_PRICE',
                                       self.user,
                                       car),
-                    'url': reverse('car-buy', args=(car.number,))}
+                    'url': reverse('car-sell', args=(car.number,))}
             return dic
         except UserProfile.NotCheckedInException:
             raise ErrorResponse(400, {'detail': 'User is not checked in'})
@@ -66,7 +66,7 @@ class CarBuyView(AuthRequiredView):
             car.buy_back(self.user)
         except Car.NotAllowedException:
             raise ErrorResponse(403,
-                {'detail': 'This car doesn not belong to you'})
+                {'detail': 'This car does not belong to you'})
         else:
             return {'status': 'ok'}
 
