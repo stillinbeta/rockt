@@ -43,4 +43,4 @@ class UserCarResource(ModelResource):
                 'riders': instance.total_fares.riders}
 
     def sell_car_url(self, instance):
-        return reverse('car-sell', args=(instance.number,))
+        return reverse('car-buy', args=(instance.number,))

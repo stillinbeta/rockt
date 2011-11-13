@@ -147,4 +147,4 @@ class UserCarApiTests(ApiTests):
             self.assertEquals(data[fare]['riders'], expected_fare.riders)
 
         self.assertEquals(data['sell_car_url'],
-                          reverse('car-sell', args=(self.car.number,)))
+                          reverse('car-buy', args=(self.car.number,)))
