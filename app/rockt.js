@@ -1,14 +1,16 @@
 //var api_url = 'https://rockt.ca/api/'
 //var apiUrl = 'http://192.168.111.156:8000/api/'
 apiUrl = '/api/'
-var username='ellie';
-var password='test';
 
 var markers = [];
 var map;
 
+
 (function($) {
+    
     $.fn.authAjax= function(url) {
+        var username = localStorage.getItem('username'); 
+        var password = localStorage.getItem('password'); 
         if (!arguments[1]) {
             arguments[1] = {}
         }
@@ -103,6 +105,10 @@ function loadList(data, header, title, itemFunc, itemBind) {
 }
 
 function failure(jqXHR) {
+    if (jqXHR.status == 403) {
+        login();
+        return; 
+    }
     try {
         var message = jqXHR.status +': ' 
             + $.parseJSON(jqXHR.responseText).detail
@@ -138,6 +144,17 @@ function loadUserData() {
         $('#home-checkinout').replaceWith(button);
         $.mobile.hidePageLoadingMsg();
     }
+}
+
+function login() {
+    $('#login-submit').one("tap", function () {
+        localStorage.setItem('username', $('#username').val());
+        localStorage.setItem('password', $('#password').val());
+        loadUserData();
+        $.mobile.changePage($('#home'));
+
+    }); 
+    $.mobile.changePage($('#login'));
 }
 
 function init() {
