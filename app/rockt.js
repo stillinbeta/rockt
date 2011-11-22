@@ -33,6 +33,7 @@ var map;
     }
 })(jQuery);
 
+// Make a jQuery Mobile button with the given text
 function makeButton(text) {
     var button = $('<a />')
     .text(text)
@@ -45,6 +46,10 @@ function makeButton(text) {
     return button;
 }
 
+// Load the google maps object. 
+// data is an array of objects with a location array [lon, lat]
+// title is the title of the page
+// infoFunc is a callback for the popup box. It takes an object as an argument
 function loadMap(data, title, infoFunc) {
     $('#map-name').text(title); 
     $.mobile.changePage($('#map'));
@@ -87,6 +92,12 @@ google.maps.event.addListener(map, 'tilesloaded', function() {
         });
 }
 
+// Fill a list with objects
+// data the list of objects
+// header the header for the page
+// title header for the list 
+// itemfunc a callback that takes an object
+// itemBind  a function to bind to each item, it also takes an object
 function loadList(data, header, title, itemFunc, itemBind) {
     $('#list-description').text(header);
     $('#list-name').text(title);
@@ -104,6 +115,16 @@ function loadList(data, header, title, itemFunc, itemBind) {
     list.listview('refresh');
 }
 
+
+// Display an error message as a dialog
+// message the error to display
+function error(message) {
+    $('#error-content').text(message);
+    $('<a href="#error" data-rel="dialog" />').click();
+}
+
+// Given a failed AJAX response, show a dialog
+// jqXHR the failed response
 function failure(jqXHR) {
     if (jqXHR.status == 403) {
         login();
@@ -116,10 +137,13 @@ function failure(jqXHR) {
     catch(e) {
         var message = jqXHR.status + ': Something bad happened';
     }
-    $('#error-content').text(message);
-    $('<a href="#error" data-rel="dialog" />').click();
+    error(message);
 }
 
+// Confirm something
+// message the message for the confirm box
+// button the text for the button
+// handler the handler for the button
 function confirmation(message, button, handler) {
     $('#confirm-title').html(message);   
     $('#confirm-confirm').replaceWith(makeButton(button, 'confirm-confirm')
@@ -128,6 +152,7 @@ function confirmation(message, button, handler) {
     $('<a href="#confirm" data-rel="dialog" />').click();
 }
 
+// Retrieve a user's username and balance and apply it to the footer
 function loadUserData() {
     $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
     .success(loadedUserData);
@@ -140,12 +165,13 @@ function loadUserData() {
         else {
             var button = makeButton('Check In', 'home-checkinout');
         }
-        button.unbind('tap').bind('tap', loadStopList);
+        button.unbind('tap').bind('tap', findMe);
         $('#home-checkinout').replaceWith(button);
         $.mobile.hidePageLoadingMsg();
     }
 }
 
+// Display the login page
 function login() {
     $('#login-submit').one("tap", function () {
         localStorage.setItem('username', $('#username').val());
@@ -157,6 +183,7 @@ function login() {
     $.mobile.changePage($('#login'));
 }
 
+// Initailize the application
 function init() {
     $.mobile.showPageLoadingMsg();
     loadUserData();
@@ -165,10 +192,22 @@ function init() {
 
 $(document).ready(init);
  
-function loadStopList() {
-    $.mobile.showPageLoadingMsg();
-    jQuery.getJSON( apiUrl + 'stop/find/43.64903/-79.3967/')
-    .success(loadedStopList);
+// Initalize the GPS and load the stop list
+function findMe() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(loadStopList, error); 
+    }
+    else {
+        error("You can't geolocate. This game will not be much fun");
+    }
+    
+    function loadStopList(position) {
+        $.mobile.showPageLoadingMsg();
+        jQuery.getJSON( apiUrl + 'stop/find/' + position.coords.latitude
+                        + '/' + position.coords.longitude + '/')
+        .success(loadedStopList)
+        .error(failure);
+    }
 
     function loadedStopList(data) { 
         loadMap(data, 'Select a stop', function (stop) {
@@ -176,9 +215,13 @@ function loadStopList() {
                 + stop.url + '\')">' + stop.description + ' (' 
                 + stop.number + ')</a>';
         });
-    }
-}
     
+    }
+  
+}
+
+// Load a stop page
+// url the url to the stop page
 function loadStop(url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {}, 'GET')
@@ -205,6 +248,10 @@ function loadStop(url) {
     }
 }
 
+// Confirm a checkin 
+// carnumber the number to check in on
+// stopNumber the current stop
+// url the url for the checkin
 function checkInConfirm(carNumber, stopNumber, url) {
     confirmation(carNumber,
                  'Check in',
@@ -222,6 +269,9 @@ function checkInConfirm(carNumber, stopNumber, url) {
     }
 }
     
+// Confirm a checkout
+// stopnumber the current stop
+// url the url to check out on
 function checkOutConfirm(stopNumber, url) {
     confirmation('Check out',
                  'Check out',
@@ -256,6 +306,8 @@ function checkOutConfirm(stopNumber, url) {
     }
 }
     
+// Confirm a purchase
+// url the URL to post the purchase to
 function purchaseConfirm(url) {
     confirmation('Purchase?',
                  'Purchase',
@@ -273,6 +325,7 @@ function purchaseConfirm(url) {
     }
 }
 
+// Show a map of your fleet
 function loadFleetMap() {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
@@ -286,6 +339,7 @@ function loadFleetMap() {
     }
 }
 
+// Show a list of your fleet
 function loadFleet() {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(apiUrl + 'user/car/', {}, 'GET')
@@ -301,6 +355,8 @@ function loadFleet() {
     }
 }
 
+// Load a car information page
+// url a car's stats_url 
 function loadCar(url) {
     $.mobile.showPageLoadingMsg();
     $.fn.authAjax(url, {}, 'GET')
@@ -328,6 +384,9 @@ function loadCar(url) {
     }            
 }
 
+// Confirm a sale
+// url the URL to post the sale to
+// number the number of the car being sold
 function confirmSell(url, number) {
     confirmation('Sell ' + number + '?',
                  'Sell',
