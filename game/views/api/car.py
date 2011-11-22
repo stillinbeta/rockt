@@ -36,7 +36,7 @@ class CheckOutView(AuthRequiredView):
                     'price': get_rule('RULE_GET_STREETCAR_PRICE',
                                       self.user,
                                       car),
-                    'url': reverse('car-buy', args=(car.number,))}
+                    'url': reverse('car-sell', args=(car.number,))}
             return dic
         except UserProfile.NotCheckedInException:
             raise ErrorResponse(400, {'detail': 'User is not checked in'})
@@ -66,7 +66,7 @@ class CarBuyView(AuthRequiredView):
             car.buy_back(self.user)
         except Car.NotAllowedException:
             raise ErrorResponse(403,
-                {'detail': 'This car doesn not belong to you'})
+                {'detail': 'This car does not belong to you'})
         else:
             return {'status': 'ok'}
 
@@ -77,14 +77,11 @@ class CarTimelineView(View):
 
         for event in Event.objects.get_car_timeline(car):
             if event.event == 'car_ride':
-                user_id = event.data.get('rider')
+                user = event.data.get('rider')
             else:
-                user_id = event.data.get('user')
+                user = event.data.get('user')
 
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                continue
-            yield {'user': user.username,
-                   'event': event.event,
-                   'date': event.date}
+            if user:
+                yield {'user': user.username,
+                       'event': event.event,
+                       'date': event.date}

@@ -158,7 +158,7 @@ class CarApiTests(TestCase):
         self.assertIn('purchase', data)
         self.assertEquals(data['purchase']['price'], price)
         self.assertEquals(data['purchase']['url'],
-                          reverse('car-buy', args=(self.car.number,)))
+                          reverse('car-sell', args=(self.car.number,)))
 
     def test_sell_auth_required(self):
         self.assertAuthRequired(reverse(self.sell_name, args=('0')))
