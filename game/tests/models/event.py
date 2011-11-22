@@ -28,6 +28,10 @@ class EventTests(TestCase):
                                 number=4212,
                                 active=True,
                                 location=[-79.402858, 43.644075],)
+        self.car3 = Car.objects.create(
+                                number=4012,
+                                active=True,
+                                location=[-79.402858, 43.644075],)
 
     def test_add_car_bought_data_correct(self):
         price = 150
@@ -88,6 +92,7 @@ class EventTests(TestCase):
         self.assertNotIn('owner', event.data)
 
     def test_get_car_timeline_accurate(self):
+        Event.objects.all().delete()
         price = 150
         e1 = Event.objects.add_car_bought(self.car, self.user, price)
         e2 = Event.objects.add_car_ride(self.user,
@@ -103,8 +108,33 @@ class EventTests(TestCase):
                                            0)
         e4 = Event.objects.add_car_sold(self.car, self.user, price)
 
-        es = Event.objects.get_car_timeline(self.car)
-        self.assertIn(e1, es)
-        self.assertIn(e2, es)
-        self.assertIn(e4, es)
-        self.assertNotIn(e3, es)
+        timeline = Event.objects.get_car_timeline(self.car)
+        self.assertIn(e1, timeline)
+        self.assertIn(e2, timeline)
+        self.assertIn(e4, timeline)
+        self.assertNotIn(e3, timeline)
+
+    def test_get_car_timeline_data_user_is_username(self):
+        Event.objects.all().delete()
+        Event.objects.add_car_bought(self.car2, self.user, 10)
+        Event.objects.add_car_ride(self.user, None,
+                                           self.car2,
+                                           self.bathurst_and_king,
+                                           self.bathurst_station,
+                                           0)
+        timeline = Event.objects.get_car_timeline(self.car2)
+        for event in timeline:
+            if event.event == 'car_ride':
+                self.assertEquals(event.data['rider'], self.user)
+            if event.event == 'car_bought':
+                self.assertEquals(event.data['user'], self.user)
+
+    def test_get_car_timeline_data_deleted_user_is_none(self):
+        Event.objects.all().all().delete()
+        temp_user = User.objects.create(username='sarah',
+                                        password="sarah@x.org")
+        Event.objects.add_car_bought(self.car2, temp_user, 10)
+        temp_user.delete()
+
+        timeline = Event.objects.get_car_timeline(self.car2)
+        self.assertIsNone(next(timeline).data['user'])

@@ -65,16 +65,16 @@
              <ul>
                 {% for event in timeline %}
                     <li>
-                        {% if event.event == 'car_bought' %}
-                            Sold to {{ event.data.user }} on 
+                        {% if event.event == 'car_bought' and event.data.user %}
+                            Sold to {{ event.data.user.username }} on 
                         {{ event.date|date:"DATE_FORMAT" }}
                         {% endif %}
-                        {% if event.event == 'car_sold' %}
-                            Sold by {{ event.data.user }} on 
+                        {% if event.event == 'car_sold' and event.data.user %}
+                            Sold by {{ event.data.user.username }} on 
                         {{ event.date|date:"DATE_FORMAT" }}
                         {% endif %}
-                        {% if event.event == 'car_ride' %}
-                            Ridden By {{ event.data.rider}} on 
+                        {% if event.event == 'car_ride' and event.data.rider %}
+                            Ridden By {{ event.data.rider.username }} on 
                         {{ event.date|date:"DATE_FORMAT" }}
                         {% endif %}
                     </li>

@@ -1,6 +1,8 @@
 from django.db import models
 from djangotoolbox.fields import DictField
 from django_mongodb_engine.contrib import MongoDBManager
+from pymongo.objectid import InvalidId
+from django.contrib.auth.models import User
 
 
 class EventManager(MongoDBManager):
@@ -38,7 +40,16 @@ class EventManager(MongoDBManager):
         return self.create(event=event, data=data)
 
     def get_car_timeline(self, car):
-        return self.raw_query({'data.car': car.number})
+        user_fields = ('old_user', 'user', 'rider')
+        for event in self.raw_query({'data.car': car.number}):
+            for field in user_fields:
+                if field in event.data:
+                    try:
+                        event.data[field] = User.objects.get(
+                            id=event.data[field])
+                    except (User.DoesNotExist, InvalidId):
+                        event.data[field] = None
+            yield event
 
 
 class Event(models.Model):
