@@ -155,7 +155,7 @@ function confirmation(message, button, handler) {
 // Retrieve a user's username and balance and apply it to the footer
 function loadUserData() {
     $.fn.authAjax(apiUrl + 'user/', {}, 'GET')
-    .success(loadedUserData);
+        .success(loadedUserData);
 
     function loadedUserData(data) {
         $('.footer').html( data.username + ' | $' + data.balance ); 
@@ -174,12 +174,12 @@ function loadUserData() {
 // Display the login page
 function login() {
     $('#login-submit').one("tap", function () {
-        localStorage.setItem('username', $('#username').val());
-        localStorage.setItem('password', $('#password').val());
-        loadUserData();
-        $.mobile.changePage($('#home'));
+            localStorage.setItem('username', $('#username').val());
+            localStorage.setItem('password', $('#password').val());
+            loadUserData();
+            $.mobile.changePage($('#home'));
 
-    }); 
+            }); 
     $.mobile.changePage($('#login'));
 }
 
@@ -191,6 +191,19 @@ function init() {
 }
 
 $(document).ready(init);
+
+// Add the home button
+$('#home').live('pagebeforecreate', function() {
+$('[data-role="header"]').prepend($('<a />')
+                                 .attr({"href": "#home",
+                                        "data-icon": "home",
+                                        "data-iconpos": "notext",  
+                                        "data-inline": true,
+                                        "data-direction": "reverse"})
+                                 .val('Home'))
+                                 .trigger('create');
+});
+
  
 // Initalize the GPS and load the stop list
 function findMe() {
@@ -363,6 +376,7 @@ function loadCar(url) {
     .success(loadedCar);
 
     function loadedCar(data) {
+        $('#car-number').text(data.number);
         $('#car-route').text(data.route);
         $('#car-active').text(data.active && 'Active' || 'Inactive');
 
