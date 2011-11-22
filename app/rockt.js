@@ -190,8 +190,8 @@ function loadStop(url) {
         }
         else {
             loadList(data.cars_nearby,
-                     data.description,
                      'Check in',
+                     data.description,
                      function (car) { return car.number },
                      function (car) { 
                          return function() {
@@ -206,20 +206,20 @@ function loadStop(url) {
 }
 
 function checkInConfirm(carNumber, stopNumber, url) {
-    confirmation('Check in on ' + carNumber,
+    confirmation(carNumber,
                  'Check in',
                  function() {
                     checkIn(stopNumber, url);
                  });
-}
 
-function checkIn(stopNumber, url) {
-    $.mobile.showPageLoadingMsg();
-    $.fn.authAjax(url, {'stop_number': stopNumber})
-    .success(function() {
-        loadUserData();
-        $.mobile.changePage($('#home'))
-    });
+    function checkIn(stopNumber, url) {
+        $.mobile.showPageLoadingMsg();
+        $.fn.authAjax(url, {'stop_number': stopNumber})
+        .success(function() {
+            loadUserData();
+            $.mobile.changePage($('#home'))
+        });
+    }
 }
     
 function checkOutConfirm(stopNumber, url) {
@@ -230,15 +230,15 @@ function checkOutConfirm(stopNumber, url) {
                      checkOut(stopNumber, url);
                  }); 
     $.mobile.hidePageLoadingMsg();
-}
 
-function checkOut(stopNumber, url) {
-    $.mobile.showPageLoadingMsg();
-    $.fn.authAjax(url, {stop_number: stopNumber})
-    .success(function(data) {
-        loadUserData();
-        checkedOut(data);
-    });
+    function checkOut(stopNumber, url) {
+        $.mobile.showPageLoadingMsg();
+        $.fn.authAjax(url, {stop_number: stopNumber})
+        .success(function(data) {
+            loadUserData();
+            checkedOut(data);
+        });
+    }
 
     function checkedOut(data) {
         $('#checkedout-fare').text(data.fare);
@@ -262,15 +262,15 @@ function purchaseConfirm(url) {
                  function() {
                      purchase(url);
                  });
-}
 
-function purchase(url) {
-    $.mobile.showPageLoadingMsg();
-    $.fn.authAjax(url)
-    .success(function(data) {
-        loadUserData();
-        $.mobile.changePage($('#home'));
-    });
+    function purchase(url) {
+        $.mobile.showPageLoadingMsg();
+        $.fn.authAjax(url)
+        .success(function(data) {
+            loadUserData();
+            $.mobile.changePage($('#home'));
+        });
+    }
 }
 
 function loadFleetMap() {
@@ -280,7 +280,8 @@ function loadFleetMap() {
 
     function loadedFleetMap(data) {
         loadMap(data, 'Fleet', function(car) {
-            return 'Car ' + car.number;
+            return '<a href onclick="loadCar(\'' + car.stats_url+ '\')"' 
+                   + ' style="color: black">Car ' + car.number + '</a>';
         });
     }
 }
