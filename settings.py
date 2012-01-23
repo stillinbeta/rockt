@@ -13,6 +13,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_engine',
         'NAME': 'rockt',
+	'USERNAME': 'rockt',
+	'PASSWORD': '$3cr3t',
     }
 }
 # Local time zone for this installation. Choices can be found here:
@@ -39,12 +41,12 @@ MEDIA_ROOT = '/home/sib/django/rockt.ca/rockt/static/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://static.stillinbeta.com/'
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/django-media/'
+ADMIN_MEDIA_PREFIX = 'https://rockt.ca/static/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '@V>=JnE;$*3:8\YxDAEJG%.9\(k68]ekuQh!*BBX4Zfn@fey$W'
@@ -87,6 +89,7 @@ INSTALLED_APPS = (
     'rockt.registration',
     'rockt.blog',
 )
+FORCE_SCRIPT_NAME=""
 
 AUTH_PROFILE_MODULE = 'game.UserProfile'
 LOGIN_URL = '/login'
