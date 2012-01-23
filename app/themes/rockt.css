@@ -165,7 +165,7 @@ a.ui-link-inherit {
 }
 
 
-/* Active class used as the "on" state across all themes
+/* Active class used as the "on" state across all themess
 -----------------------------------------------------------------------------------------------------------*/
 
 .ui-btn-active {
@@ -282,7 +282,7 @@ a.ui-link-inherit {
 .ui-icon-searchfield:after {
 	background: #FFFFFF /*{global-icon-color}*/;
 	background: rgba(145,0,0,0.001) /*{global-icon-disc}*/;
-	background-image: url(http://code.jquery.com/mobile/latest/images/icons-18-white.png) /*{global-icon-set}*/;
+	background-image: url(images/icons-18-white.png) /*{global-icon-set}*/;
 	background-repeat: no-repeat;
 	-moz-border-radius: 				9px;
 	-webkit-border-radius: 				9px;

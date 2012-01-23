@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Rockt</title>
-	<link rel="stylesheet" href="themes/rockt.css" />
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile.structure-1.0rc2.min.css" />	
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rockt</title>
+    <link rel="stylesheet" href="themes/rockt.css" />
+    <link rel="stylesheet" href="jquery.mobile.structure-1.0.min.css" /> 
     <link rel="icon" href="logo.png" />
     <link rel="apple-touch-icon" href="logo-touch.png" />
-<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script> 
-	<script src="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.js"></script>
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
-    <script src="rockt.js"></script>
-    <script src="jquery-base64.js"></script>
+    <script src="js/jquery-1.7.1.min.js"></script> 
+    <script src="js/jquery.mobile-1.0.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <script src="js/rockt.js"></script>
+    <script src="js/jquery-base64.js"></script>
 </head> 
 <body> 
     <div id="home" data-role="page" data-theme="a">
         <div data-role="header"><h1>Rockt</h1></div>
         <div data-role="content">
           <a id="home-checkinout"></a>
-            <a href="javascript:loadFleetMap()" data-role="button">Fleet Map</a>
-            <a href="javascript:loadFleet()" data-role="button">Fleet</a>
+          <a href="javascript:loadFleetMap()" data-role="button">Fleet Map</a>
+          <a href="javascript:loadFleet()" data-role="button">Fleet</a>
         </div>
         <div data-role="footer" data-position="fixed">
             <h2 class="footer"></h2>
@@ -125,5 +125,5 @@
             <h2 class="footer"></h2>
         </div>
     </div>        
-</body>	
+</body>    
 </html>
