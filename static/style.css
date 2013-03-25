@@ -1,0 +1,358 @@
+body{
+    background: url('/static/background.png');
+    color:white;
+    font-family: 'PT Sans', sans-serif;
+}
+
+a, a:visited {
+    color: white;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+.button {
+    display: block;
+    font-size: 24pt;
+    border: 4px solid black;
+    line-height: 40px;
+    text-align: center;
+    background: #5B0000; 
+    border-radius: 4px;
+    color: white;
+}
+
+.button:hover {
+    background: #4B0000;
+    text-decoration: none;
+}
+
+#centre {
+    width: 800px;
+    margin: 0 auto 10px auto;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px #555;
+    
+}
+
+#userbox{
+    border-top: 12px solid white;
+    border-bottom: 12px solid white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #910000;
+}
+
+    .userbox-float{
+        color: white;
+        font-size: 14pt;
+        padding: 5px 5px 5px 5px;
+        margin: 2px 0 2px 0;
+        text-align: right;
+    }
+
+#menu {
+    background-color: black;
+    color: white;
+    padding: 8px 25px;
+    border-bottom: 10px solid white;
+    overflow: hidden;
+
+}
+    #menu ul{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+        #menu ul li {
+            float: left;
+            margin: 0 10px;
+            text-align: center;
+            line-height: 75px;
+            width: 220px;
+            border: 5px solid #222;
+            border-radius: 10px;
+            background-color: black;
+        }
+
+        #menu ul li:hover , #menu ul li.selected {
+            background-color: #111;
+        }
+
+        #menu a, #menu a:visited, #menu a:hover {
+            font-size: 25pt;
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
+
+#content {
+    padding: 25px 10px 25px 10px;
+    background-color: #910000;
+    min-height: 500px;
+
+}
+
+#content ul.messages {
+    width: 400px;
+    margin: 0 auto 20px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 2px;
+    padding: 20px;
+    list-style: none;
+}
+    #content ul.messages li {
+        color: black;
+        text-align: center;
+        font-size: 18pt;
+    }
+    #content ul.messages li.error{
+        color: red;
+    }
+
+#footer {
+    text-align: center;
+    padding: 10px 0 10px 0;
+    height: 20px;
+    background-color: #3e3e3e;
+    width: 800px;
+    border-top: 12px solid white;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+    #footer a, #footer a:visited {
+        font-family: sans-serif;
+    }
+
+/* Home */
+#home {
+    width: 700px;
+    margin: 0 auto;
+}
+
+    #home p {
+        font-size: 18pt;
+    }
+
+    #home a.button {
+        width: 400px; 
+        padding: 30px;
+        margin: 20px auto 0;
+    }
+
+/* map */
+
+#map {
+    margin: 0 auto 0 auto;
+}
+
+    #map a {
+        color: black;
+        font-family: san-serif;
+    }
+
+
+/* Fleet */
+
+#car-list ul {
+    width: 75%;
+    margin: 0 auto 0 auto;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid white;
+}
+
+    #car-list li {
+        border-top: 1px solid white;
+    }
+
+    #car-list ul li a {
+            padding: 25px;
+            display: block;
+            font-size: 22pt;
+    }
+    #car-list ul li a:hover {
+        text-decoration: none;
+        background-color: #A73333;
+    }
+    
+    #car-list ul li a .revenue {
+        float: right;
+    }
+
+/* Fleet Car */
+
+#car-data{
+    padding: 0 25px 0 45px; 
+    font-size: 18pt;
+    color: white;
+}
+    #car-data #car-data-top {
+        overflow: hidden;
+        margin: 0 40px 0 0 ;
+    }
+    #car-data-top #car-data-stats {
+        float: left;
+    }
+        #car-data #car-data-stats ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+            #car-data #car-data-stats ul li {
+                padding-top: 5px;
+            }
+            #car-data #car-data-stats h1 { 
+                font-size: 30pt;
+                padding: 0;
+                margin: 0;
+            }
+
+            #car-data #car-data-stats .button {
+                margin-top: 20px; 
+            }
+            
+            #car-data #car-data-stats ul li.status-inactive {
+                color: grey;
+            }
+
+    #car-data #car-data-map {
+        float: right;
+    }
+    #car-data #fare-table {
+        margin: 20px 100px 0;
+    }
+    #car-data #fare-table tr th {
+        padding: 0 15px 0 15px;
+    }
+    #car-data #fare-table tr td {
+        text-align: center;
+    }
+
+    #car-data h2 {
+        margin: 0;
+        padding: 0;
+        font-size: 24pt;
+    }
+    #car-data #timeline ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    
+#sell-car {
+    text-align: center;
+}
+
+    #sell-car #button-container {
+        padding: 0 45px;
+    }
+    #sell-car a {
+        width: 300px;
+        float: left;
+    }
+
+    #sell-car input {
+        cursor: pointer;
+        color: white;
+        width: 300px;
+        float: right; 
+    }
+
+/* Profile */
+
+#form {
+    font-size: 16pt;
+}
+    #form p {
+        overflow: hidden;
+    }
+
+    #form label {
+        width: 200px;
+        text-align: right;
+        display: block;
+        float: left;
+    }
+    
+    #form input {
+        margin-left: 10px;
+        border: 2px solid black;
+        border-radius: 4px;
+        font-size: 16pt;
+        width: 300px;
+    }
+
+    #form input[type="submit"] {
+        margin-left: 210px;
+    } 
+
+    #form ul.errorlist {
+        margin-left: 210px;
+        padding: 0;
+        list-style: none;
+        width: 300px;
+    }
+
+    #form span.helptext {
+        display: block;
+        font-size: 12pt;
+        width: 250px;
+        float: right;
+    }
+
+#waiting-list {
+    width: 600px;
+    margin: 0 auto;
+}
+
+    #waiting-list p.description {
+        font-size: 18pt;
+    }
+
+    #waiting-list input {
+        border: 3px solid black;
+        border-radius: 3px;
+        height: 50px;
+        padding: 0;
+        margin: 0;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+    }
+
+
+    #waiting-list .field-wrapper {
+        float: left;
+    }
+        #waiting-list .field-wrapper input {
+            width: 450px;
+            font-size: 20pt;
+        }
+
+    #waiting-list input.button {
+        width: 125px;
+        float: right;
+    }
+
+    #waiting-list ul {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+#blog .post {
+    border-bottom: 2px solid white;
+}
+
+    #blog .post .title , #blog .post .date{
+        padding: 0;
+        margin: 0;
+    }
+
+    #blog .post .date {
+        font-size: 11pt;
+    }
